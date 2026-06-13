@@ -118,8 +118,8 @@
 
     {{-- MODAL DETAIL & CETAK STRUK --}}
     @if($showDetailModal && $selectedOrder)
-    <div class="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm px-4 animate-fade-in">
-        <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-100">
+    <div class="fixed inset-0 flex items-center justify-center bg-slate-900/70 backdrop-blur-sm px-4 animate-fade-in" style="z-index: 70;">
+        <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-slate-100" style="max-height: 90vh;">
             {{-- Header --}}
             <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-white relative z-10">
                 <div class="flex items-center gap-3">
@@ -250,8 +250,8 @@
 
                     {{-- Frame Struk --}}
                     <div class="bg-slate-800 p-4 rounded-2xl shadow-inner flex-1 flex flex-col items-center justify-start overflow-hidden relative">
-                        <div class="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:16px_16px] opacity-30"></div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 relative z-10">Live Preview Struk</p>
+                        <div class="absolute inset-0 opacity-30" style="background-image: radial-gradient(#334155 1px, transparent 1px); background-size: 16px 16px;"></div>
+                        <p class="font-bold text-slate-400 uppercase tracking-widest mb-3 relative z-10" style="font-size: 10px; line-height: 1;">Live Preview Struk</p>
                         
                         <div class="bg-white shadow-xl relative z-10 flex-1 flex justify-center py-2 rounded" style="width: 64mm; overflow: hidden; min-height: 250px;" id="receipt-preview-container">
                             <iframe src="{{ route('kasir.struk', $selectedOrder->id) }}" id="receipt-iframe" class="border-none pointer-events-none" style="width: 58mm; min-height: 400px;"></iframe>
