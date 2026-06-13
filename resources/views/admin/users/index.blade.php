@@ -8,35 +8,37 @@
 <div class="space-y-5 animate-fade-in">
 
     {{-- ===== HEADER BAR ===== --}}
-    <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+    <div class="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
         {{-- Search & Filter --}}
-        <form action="{{ route('admin.users.index') }}" method="GET" class="flex items-center gap-2">
-            <div class="relative">
+        <form action="{{ route('admin.users.index') }}" method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
+            <div class="relative flex-1">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="fa-solid fa-magnifying-glass text-slate-400 text-sm"></i>
                 </div>
                 <input type="text" name="search" value="{{ request('search') }}"
                     placeholder="Cari nama, username, email..."
-                    class="pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all w-64">
+                    class="pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all w-full md:w-64">
             </div>
-            <select name="role" class="text-sm border border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-                <option value="">Semua Role</option>
-                <option value="admin"  {{ request('role') == 'admin'  ? 'selected' : '' }}>Admin</option>
-                <option value="kasir"  {{ request('role') == 'kasir'  ? 'selected' : '' }}>Kasir</option>
-            </select>
-            <button type="submit" class="bg-slate-700 text-white text-sm px-4 py-2.5 rounded-xl hover:bg-slate-800 transition-colors">
-                Filter
-            </button>
-            @if(request()->hasAny(['search','role']))
-            <a href="{{ route('admin.users.index') }}" class="text-slate-500 text-sm px-3 py-2.5 rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-1">
-                <i class="fa-solid fa-xmark"></i> Reset
-            </a>
-            @endif
+            <div class="flex items-center gap-2">
+                <select name="role" class="text-sm border border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all flex-1 sm:flex-none">
+                    <option value="">Semua Role</option>
+                    <option value="admin"  {{ request('role') == 'admin'  ? 'selected' : '' }}>Admin</option>
+                    <option value="kasir"  {{ request('role') == 'kasir'  ? 'selected' : '' }}>Kasir</option>
+                </select>
+                <button type="submit" class="bg-slate-700 text-white text-sm px-4 py-2.5 rounded-xl hover:bg-slate-800 transition-colors font-semibold">
+                    Filter
+                </button>
+                @if(request()->hasAny(['search','role']))
+                <a href="{{ route('admin.users.index') }}" class="text-slate-500 text-sm px-3 py-2.5 rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-1">
+                    <i class="fa-solid fa-xmark"></i> Reset
+                </a>
+                @endif
+            </div>
         </form>
 
         {{-- Tambah User --}}
         <a href="{{ route('admin.users.create') }}"
-            class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm shadow-blue-500/30 hover:shadow-blue-500/40 transition-all hover:-translate-y-0.5">
+            class="w-full md:w-auto inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm shadow-blue-500/30 hover:shadow-blue-500/40 transition-all hover:-translate-y-0.5">
             <i class="fa-solid fa-user-plus"></i>
             Tambah User
         </a>
@@ -44,7 +46,8 @@
 
     {{-- ===== TABLE ===== --}}
     <div class="bg-white rounded-2xl shadow-sm border border-surface-200 overflow-hidden">
-        <table class="w-full text-sm">
+        <div class="overflow-x-auto w-full">
+            <table class="w-full text-sm min-w-[800px]">
             <thead class="bg-slate-50 border-b border-slate-100">
                 <tr>
                     <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">User</th>
@@ -110,14 +113,14 @@
                                 <form action="{{ route('admin.users.restore', $user->id) }}" method="POST">
                                     @csrf @method('PATCH')
                                     <button type="submit" title="Pulihkan"
-                                        class="p-2 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors">
+                                        class="p-2 bg-emerald-50 border border-emerald-100 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors">
                                         <i class="fa-solid fa-rotate-left text-sm"></i>
                                     </button>
                                 </form>
                             @else
                                 {{-- Edit --}}
                                 <a href="{{ route('admin.users.edit', $user) }}" title="Edit"
-                                    class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors">
+                                    class="p-2 bg-blue-50 border border-blue-100 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors">
                                     <i class="fa-solid fa-pen text-sm"></i>
                                 </a>
                                 {{-- Toggle Status --}}
@@ -125,7 +128,7 @@
                                 <form action="{{ route('admin.users.toggle-status', $user) }}" method="POST">
                                     @csrf @method('PATCH')
                                     <button type="submit" title="{{ $user->is_active ? 'Nonaktifkan' : 'Aktifkan' }}"
-                                        class="p-2 {{ $user->is_active ? 'text-amber-600 hover:bg-amber-100' : 'text-emerald-600 hover:bg-emerald-100' }} rounded-lg transition-colors">
+                                        class="p-2 {{ $user->is_active ? 'bg-amber-50 border border-amber-100 text-amber-600 hover:bg-amber-100' : 'bg-emerald-50 border border-emerald-100 text-emerald-600 hover:bg-emerald-100' }} rounded-lg transition-colors">
                                         <i class="fa-solid {{ $user->is_active ? 'fa-toggle-on' : 'fa-toggle-off' }} text-sm"></i>
                                     </button>
                                 </form>
@@ -134,7 +137,7 @@
                                     @csrf @method('DELETE')
                                     <button type="button" title="Hapus"
                                         onclick="confirmDelete('del-user-{{ $user->id }}', '{{ $user->name }}')"
-                                        class="p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors">
+                                        class="p-2 bg-red-50 border border-red-100 text-red-500 hover:bg-red-100 rounded-lg transition-colors">
                                         <i class="fa-solid fa-trash text-sm"></i>
                                     </button>
                                 </form>
@@ -154,6 +157,8 @@
                 @endforelse
             </tbody>
         </table>
+
+        </div>
 
         {{-- Pagination --}}
         @if($query->hasPages())

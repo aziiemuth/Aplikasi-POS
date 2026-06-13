@@ -74,6 +74,11 @@
         .btn-submit-gradient:hover {
             background: linear-gradient(135deg, #1d4ed8 0%, #4338ca 100%) !important;
         }
+        /* Hide Edge/IE default reveal password icon */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear {
+            display: none;
+        }
     </style>
 </head>
 <body class="font-sans min-h-screen flex items-center justify-center p-4 bg-mesh">

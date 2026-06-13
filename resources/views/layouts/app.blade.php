@@ -30,19 +30,14 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        // Palet warna utama POS — elegan & soft
                         primary: {
                             50:  '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
                             300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6',
                             600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a',
                         },
                         surface: {
-                            // Putih soft bergradasi — tidak menyilaukan mata kasir
-                            DEFAULT: '#f8fafc',
-                            50:  '#f8fafc',
-                            100: '#f1f5f9',
-                            200: '#e2e8f0',
-                            300: '#cbd5e1',
+                            DEFAULT: '#f8fafc', 50: '#f8fafc', 100: '#f1f5f9',
+                            200: '#e2e8f0', 300: '#cbd5e1',
                         },
                         sidebar: '#1e293b',
                     },
@@ -58,6 +53,30 @@
             }
         }
     </script>
+
+    {{-- Custom CSS untuk memastikan flex berjalan di CDN --}}
+    <style>
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem 1rem;
+            color: #94a3b8;
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .sidebar-link:hover {
+            color: #ffffff;
+            background-color: rgba(51, 65, 85, 0.6);
+        }
+        .sidebar-link.active {
+            color: #ffffff;
+            background-color: rgba(37, 99, 235, 0.7);
+        }
+    </style>
 
     {{-- Vite Assets --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])

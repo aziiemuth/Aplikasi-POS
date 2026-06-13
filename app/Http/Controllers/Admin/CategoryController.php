@@ -21,6 +21,10 @@ class CategoryController extends Controller
             ->paginate(15)
             ->withQueryString();
 
+        if ($request->ajax()) {
+            return view('admin.categories._grid', compact('categories'))->render();
+        }
+
         return view('admin.categories.index', compact('categories'));
     }
 

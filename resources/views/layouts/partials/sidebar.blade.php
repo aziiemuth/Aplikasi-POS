@@ -1,12 +1,13 @@
 {{-- ===== SIDEBAR — Dynamic berdasarkan Role (Fase 2.1 + 3.1) ===== --}}
-<aside id="sidebar"
-    class="w-64 bg-sidebar flex flex-col h-full shadow-2xl transition-all duration-300 ease-in-out z-30 absolute md:relative"
-    :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'">
+{{-- Mobile Overlay --}}
+<div x-cloak x-show="sidebarOpen" x-transition.opacity
+     @click="sidebarOpen = false"
+     style="display: none;"
+     class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-20 md:hidden"></div>
 
-    {{-- Mobile Overlay --}}
-    <div x-show="sidebarOpen" x-transition.opacity
-         @click="sidebarOpen = false"
-         class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[-1] md:hidden"></div>
+<aside id="sidebar"
+    class="w-64 bg-sidebar flex flex-col shadow-2xl transition-all duration-300 ease-in-out z-30 fixed inset-y-0 left-0 md:relative -translate-x-full md:translate-x-0"
+    :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'">
 
     {{-- Logo / App Name --}}
     <div class="flex items-center gap-3 px-6 py-5 border-b border-slate-700">
@@ -24,7 +25,7 @@
     <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-0.5 scrollbar-thin scrollbar-track-slate-800 scrollbar-thumb-slate-600">
 
         {{-- ===== MENU KASIR (Semua role) ===== --}}
-        <div class="mb-3">
+        <div class="mb-3 flex flex-col gap-1">
             <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider px-3 mb-1.5">Transaksi</p>
 
             <a href="{{ route('kasir.pos') }}"
@@ -52,7 +53,7 @@
         @if(auth()->user()->isAdmin())
 
         {{-- Dashboard --}}
-        <div class="mb-3 pt-2 border-t border-slate-700/60">
+        <div class="mb-3 pt-2 border-t border-slate-700/60 flex flex-col gap-1">
             <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider px-3 mb-1.5">Admin Panel</p>
 
             <a href="{{ route('admin.dashboard') }}"
@@ -69,7 +70,7 @@
         </div>
 
         {{-- === FASE 3: Master Data === --}}
-        <div class="mb-3 pt-2 border-t border-slate-700/60">
+        <div class="mb-3 pt-2 border-t border-slate-700/60 flex flex-col gap-1">
             <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider px-3 mb-1.5">Master Data</p>
 
             <a href="{{ route('admin.categories.index') }}"
@@ -98,7 +99,7 @@
         </div>
 
         {{-- === FASE 3: Manajemen Stok === --}}
-        <div class="mb-3 pt-2 border-t border-slate-700/60">
+        <div class="mb-3 pt-2 border-t border-slate-700/60 flex flex-col gap-1">
             <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider px-3 mb-1.5">Manajemen Stok</p>
 
             <a href="{{ route('admin.stock.masuk') }}"
@@ -121,7 +122,7 @@
         </div>
 
         {{-- Placeholder Laporan (Fase 7) --}}
-        <div class="mb-3 pt-2 border-t border-slate-700/60">
+        <div class="mb-3 pt-2 border-t border-slate-700/60 flex flex-col gap-1">
             <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider px-3 mb-1.5">Laporan</p>
 
             <a href="#" class="sidebar-link opacity-40 cursor-not-allowed" title="Tersedia di Fase 7">

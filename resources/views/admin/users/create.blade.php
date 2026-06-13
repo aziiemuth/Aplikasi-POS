@@ -13,7 +13,7 @@
     </a>
 
     <div class="bg-white rounded-2xl shadow-sm border border-surface-200 overflow-hidden">
-        <div class="px-8 py-5 border-b border-surface-100 flex items-center gap-3">
+        <div class="px-5 sm:px-8 py-5 border-b border-surface-100 flex items-center gap-3">
             <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
                 <i class="fa-solid fa-user-plus text-blue-600"></i>
             </div>
@@ -23,7 +23,7 @@
             </div>
         </div>
 
-        <form action="{{ route('admin.users.store') }}" method="POST" class="px-8 py-6 space-y-5">
+        <form action="{{ route('admin.users.store') }}" method="POST" class="px-5 sm:px-8 py-6 space-y-5">
             @csrf
 
             {{-- Name --}}
@@ -35,7 +35,7 @@
             </div>
 
             {{-- Username + Email --}}
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="form-label">Username <span class="text-red-500">*</span></label>
                     <input type="text" name="username" value="{{ old('username') }}" placeholder="username123"
@@ -51,7 +51,7 @@
             </div>
 
             {{-- Phone + Role --}}
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="form-label">Nomor HP</label>
                     <input type="text" name="phone" value="{{ old('phone') }}" placeholder="08xxxxxxxxxx"
@@ -74,7 +74,7 @@
             </div>
 
             {{-- Password + Confirm --}}
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="form-label">Password <span class="text-red-500">*</span></label>
                     <input type="password" name="password" placeholder="Min. 8 karakter"

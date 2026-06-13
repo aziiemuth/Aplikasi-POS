@@ -127,6 +127,23 @@
     }
 
     async function testPrinterBluetooth() {
+        // Cek HTTPS/Secure Context (Syarat wajib Web Bluetooth API)
+        if (!window.isSecureContext && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+            Swal.fire({
+                title: 'Bluetooth Diblokir Browser',
+                html: '<div class="text-sm text-left">Browser memblokir akses Bluetooth karena koneksi bukan HTTPS.<br><br><b>Solusi:</b><br>1. Gunakan HTTPS (ngrok/Cloudflare)<br>2. Atau ketik <code>chrome://flags/#unsafely-treat-insecure-origin-as-secure</code> di Chrome HP Anda, isi IP komputer ini dan ubah ke <b>Enabled</b>.</div>',
+                icon: 'warning',
+                confirmButtonColor: '#3b82f6',
+                customClass: { popup: 'rounded-2xl' }
+            });
+            return;
+        }
+
+        if (!navigator.bluetooth) {
+            Swal.fire('Error', 'Browser Anda tidak mendukung Web Bluetooth API.', 'error');
+            return;
+        }
+
         try {
             const device = await navigator.bluetooth.requestDevice({
                 filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }],

@@ -5,6 +5,10 @@
 
 @push('styles')
 <style>
+#barcode-main {
+    max-width: 100%;
+    height: auto;
+}
 @media print {
     body * { visibility: hidden; }
     #print-area, #print-area * { visibility: visible; }
@@ -68,7 +72,7 @@
                 <div id="print-area" class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
                     <p class="text-xs font-bold text-slate-800 mb-1">{{ config('app.name') }}</p>
                     <p class="text-xs text-slate-600 mb-2 leading-tight">{{ $product->nama_produk }}</p>
-                    <svg id="barcode-main"></svg>
+                    <svg id="barcode-main" class="mx-auto block"></svg>
                     <p class="text-xs font-bold text-slate-700 mt-1">
                         Rp {{ number_format($product->harga_jual, 0, ',', '.') }}
                     </p>

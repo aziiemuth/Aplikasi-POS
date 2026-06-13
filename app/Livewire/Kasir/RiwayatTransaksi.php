@@ -74,7 +74,7 @@ class RiwayatTransaksi extends Component
         $query->orderByDesc('created_at');
 
         return view('livewire.kasir.riwayat-transaksi', [
-            'orders' => $query->paginate(15)
+            'orders' => $query->paginate(20)
         ])->layout('layouts.app');
     }
 }

@@ -1,4 +1,4 @@
-<div>
+<div x-data="{ showCart: false }">
     @section('title', 'Point of Sale')
     @section('page-title', 'Point of Sale')
     @section('page-subtitle', 'Transaksi Cepat & Responsif')
@@ -40,7 +40,7 @@
                             placeholder="Cari nama produk atau scan barcode/SKU..."
                             id="pos-search-input"
                             class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all"
-                            autofocus>
+                            x-init="if (window.innerWidth > 768) $el.focus()">
                     </div>
                     {{-- Tombol Scan Kamera --}}
                     <button type="button" onclick="openCameraScanner()"
@@ -164,13 +164,35 @@
         </div>
 
         {{-- ===== KANAN: KERANJANG (30%) ===== --}}
-        <div class="w-full lg:w-1/3 flex flex-col h-full bg-white rounded-2xl shadow-sm border border-surface-200 overflow-hidden">
+        
+        {{-- Floating Bubble Cart (Mobile Only) --}}
+        <button @click="showCart = true" class="lg:hidden fixed bottom-6 right-4 z-40 bg-blue-600 text-white p-2.5 pr-4 rounded-full shadow-2xl shadow-blue-500/40 flex items-center gap-3 transition-transform animate-fade-in hover:scale-105 active:scale-95 border-2 border-white">
+            <div class="relative bg-white/20 p-2 rounded-full w-10 h-10 flex items-center justify-center">
+                <i class="fa-solid fa-basket-shopping text-lg"></i>
+                <span class="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border border-blue-600">{{ $carts->count() }}</span>
+            </div>
+            <div class="flex flex-col items-start leading-tight">
+                <span class="text-[10px] font-medium text-blue-100">Checkout</span>
+                <span class="text-sm font-bold">Rp {{ number_format(max(0, $subtotal - $diskonGlobal + $pajakPpn), 0, ',', '.') }}</span>
+            </div>
+        </button>
+
+        {{-- Mobile Overlay Background --}}
+        <div x-cloak x-show="showCart" x-transition.opacity style="display: none;" class="fixed inset-0 bg-slate-900/60 z-50 lg:hidden backdrop-blur-sm" @click="showCart = false"></div>
+
+        <div class="fixed inset-y-0 right-0 z-50 w-[85%] sm:w-[400px] lg:w-1/3 lg:relative lg:z-auto flex flex-col h-full bg-white lg:rounded-2xl shadow-2xl lg:shadow-sm border-l lg:border border-surface-200 overflow-hidden transition-transform duration-300 translate-x-full lg:translate-x-0"
+             :class="showCart ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'">
 
             {{-- Header Keranjang --}}
             <div class="p-4 bg-slate-800 text-white flex justify-between items-center shrink-0">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-cart-shopping text-blue-400"></i>
-                    <h2 class="font-bold">Keranjang</h2>
+                <div class="flex items-center gap-3">
+                    <button @click="showCart = false" class="lg:hidden w-8 h-8 flex items-center justify-center bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-300 hover:text-white transition-colors">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-cart-shopping text-blue-400"></i>
+                        <h2 class="font-bold">Keranjang</h2>
+                    </div>
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="bg-blue-600 text-xs px-2 py-1 rounded-md font-bold">{{ $carts->count() }} item</span>
@@ -436,7 +458,7 @@
     </div>
 
     {{-- MODAL CAMERA SCANNER --}}
-    <div id="camera-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm px-4">
+    <div id="camera-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm px-4">
         <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden animate-fade-in flex flex-col">
             <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
                 <h3 class="font-bold text-slate-800 flex items-center gap-2">
@@ -447,7 +469,13 @@
                 </button>
             </div>
             <div class="p-6 relative">
-                <div id="reader" class="w-full h-auto min-h-[300px] bg-slate-900 rounded-xl overflow-hidden"></div>
+                <div class="relative w-full h-auto min-h-[300px] bg-slate-900 rounded-xl overflow-hidden">
+                    <div id="reader" class="w-full h-full"></div>
+                    <div id="scanner-loading" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 gap-3 bg-slate-900 pointer-events-none">
+                        <i class="fa-solid fa-circle-notch fa-spin text-3xl text-blue-500"></i>
+                        <span class="text-sm">Menghubungkan ke kamera...</span>
+                    </div>
+                </div>
                 <div id="scan-feedback" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-emerald-500 text-white px-4 py-2 rounded-lg font-bold shadow-xl hidden flex-col items-center gap-1 z-10">
                     <i class="fa-solid fa-check-circle text-2xl"></i>
                     <span>Terpindai!</span>
@@ -532,77 +560,169 @@
     // GLOBAL BARCODE SCANNER (Fase 5.1)
     // Standby tanpa perlu klik kolom dulu
     // ========================================
-    let scanBuffer = '';
-    let scanTimer  = null;
-    const SCAN_DELAY = 100; // ms antara karakter — scanner fisik biasanya < 100ms/karakter
+    window.scanBuffer = window.scanBuffer || '';
+    window.scanTimer  = window.scanTimer || null;
 
-    document.addEventListener('keypress', function(e) {
-        // Abaikan jika sedang di input field lain (modal, dll)
-        const target = e.target.tagName.toLowerCase();
-        if (['input', 'textarea', 'select'].includes(target) && e.target.id !== 'pos-search-input') return;
+    // Ekspos fungsi perantara global yang selalu di-update ke instance component aktif
+    window.handleBarcodeScan = function(sku) {
+        @this.call('handleBarcodeScan', sku);
+    };
 
-        if (e.key === 'Enter') {
-            if (scanBuffer.length > 0) {
-                // Trigger pencarian SKU & Add to Cart
-                @this.call('handleBarcodeScan', scanBuffer);
-                scanBuffer = '';
-                clearTimeout(scanTimer);
+    if (!window.barcodeListenerRegistered) {
+        document.addEventListener('keypress', function(e) {
+            // Abaikan jika sedang di input field lain (modal, dll)
+            const target = e.target.tagName.toLowerCase();
+            if (['input', 'textarea', 'select'].includes(target) && e.target.id !== 'pos-search-input') return;
+
+            if (e.key === 'Enter') {
+                if (window.scanBuffer.length > 0) {
+                    // Trigger pencarian SKU & Add to Cart
+                    if (typeof window.handleBarcodeScan === 'function') {
+                        window.handleBarcodeScan(window.scanBuffer);
+                    }
+                    
+                    // Bersihkan input pencarian jika ada ketikan dari scanner
+                    const searchInput = document.getElementById('pos-search-input');
+                    if (searchInput) {
+                        searchInput.value = '';
+                        searchInput.dispatchEvent(new Event('input'));
+                    }
+                    
+                    window.scanBuffer = '';
+                    clearTimeout(window.scanTimer);
+                }
+            } else {
+                window.scanBuffer += e.key;
+                clearTimeout(window.scanTimer);
+                window.scanTimer = setTimeout(() => { window.scanBuffer = ''; }, 500);
             }
-        } else {
-            scanBuffer += e.key;
-            clearTimeout(scanTimer);
-            scanTimer = setTimeout(() => { scanBuffer = ''; }, 500);
-        }
-    });
+        });
+        window.barcodeListenerRegistered = true;
+    }
 
     // ========================================
     // CAMERA SCANNER (Fase 5.2)
     // ========================================
-    let html5QrcodeScanner = null;
-    let scanDelay = false;
+    window.html5QrCode = window.html5QrCode || null;
+    window.scanDelay = window.scanDelay || false;
 
     function openCameraScanner() {
+        // Cek HTTPS/Secure Context (Syarat wajib browser untuk akses Kamera)
+        if (!window.isSecureContext && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+            Swal.fire({
+                title: 'Kamera Diblokir Browser',
+                html: '<div class="text-sm text-left">Browser (Chrome/Safari) memblokir akses kamera karena Anda mengakses via IP lokal (HTTP).<br><br><b>Solusi:</b><br>1. Gunakan HTTPS (ngrok/Cloudflare)<br>2. Atau ketik <code>chrome://flags/#unsafely-treat-insecure-origin-as-secure</code> di Chrome HP Anda, lalu masukkan IP komputer ini dan ubah ke <b>Enabled</b>.</div>',
+                icon: 'warning',
+                confirmButtonColor: '#3b82f6',
+                customClass: { popup: 'rounded-2xl' }
+            });
+            return;
+        }
+
         document.getElementById('camera-modal').classList.remove('hidden');
         document.getElementById('camera-modal').classList.add('flex');
+        document.getElementById('scanner-loading').classList.remove('hidden');
         
-        if (!html5QrcodeScanner) {
-            html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
-                fps: 10, 
-                qrbox: {width: 250, height: 150},
-                supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
-            }, false);
-            
-            html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        if (!window.html5QrCode) {
+            window.html5QrCode = new Html5Qrcode("reader");
         }
+
+        const config = { 
+            fps: 10, 
+            qrbox: { width: 250, height: 150 } 
+        };
+
+        // Mulai scanning dengan kamera belakang (environment)
+        window.html5QrCode.start(
+            { facingMode: "environment" },
+            config,
+            onScanSuccess,
+            onScanFailure
+        ).then(() => {
+            // Hilangkan spinner setelah video streaming aktif
+            document.getElementById('scanner-loading').classList.add('hidden');
+        }).catch(err => {
+            console.error("Gagal memulai scanner:", err);
+            document.getElementById('scanner-loading').classList.add('hidden');
+            
+            let errorMessage = "Gagal mengakses kamera. Pastikan izin kamera telah diberikan.";
+            const errStr = err.toString();
+            if (err.name === 'NotAllowedError' || errStr.includes('NotAllowedError') || errStr.includes('Permission denied')) {
+                errorMessage = "Izin kamera ditolak. Silakan buka Pengaturan HP -> Aplikasi -> Chrome -> Izin -> Kamera, dan ubah menjadi 'Izinkan'.";
+            } else if (err.name === 'NotFoundError' || errStr.includes('NotFoundError')) {
+                errorMessage = "Kamera tidak ditemukan pada perangkat ini.";
+            } else if (err.name === 'NotReadableError' || errStr.includes('NotReadableError') || errStr.includes('Could not start video source')) {
+                errorMessage = "Kamera sedang digunakan oleh aplikasi lain atau diblokir oleh OS. Coba muat ulang browser atau tutup aplikasi kamera lain.";
+            } else if (errStr.includes('secure context') || err.name === 'SecurityError') {
+                errorMessage = "Browser memblokir akses kamera karena koneksi tidak aman (HTTP). Silakan aktifkan bendera chrome://flags untuk IP ini.";
+            }
+
+            Swal.fire({
+                title: 'Akses Kamera Gagal',
+                text: errorMessage,
+                icon: 'error',
+                confirmButtonColor: '#ef4444',
+                customClass: { popup: 'rounded-2xl' }
+            });
+            closeCameraScanner();
+        });
     }
 
     function closeCameraScanner() {
         document.getElementById('camera-modal').classList.add('hidden');
         document.getElementById('camera-modal').classList.remove('flex');
-        if (html5QrcodeScanner) {
-            html5QrcodeScanner.clear().catch(error => console.error("Failed to clear scanner. ", error));
-            html5QrcodeScanner = null;
+        if (window.html5QrCode) {
+            const tempScanner = window.html5QrCode;
+            window.html5QrCode = null; // reset instance
+            if (tempScanner.isScanning) {
+                tempScanner.stop().then(() => {
+                    console.log("Scanner stopped.");
+                }).catch(error => {
+                    console.error("Failed to stop scanner. ", error);
+                });
+            }
         }
     }
 
     function onScanSuccess(decodedText, decodedResult) {
-        if (scanDelay) return; // Mencegah scan berulang
-        scanDelay = true;
+        if (window.scanDelay) return; // Mencegah scan berulang
+        window.scanDelay = true;
         
         // UI Feedback
         const feedback = document.getElementById('scan-feedback');
-        feedback.classList.remove('hidden');
-        feedback.classList.add('flex');
+        if (feedback) {
+            feedback.classList.remove('hidden');
+            feedback.classList.add('flex');
+        }
         
-        // Trigger Livewire handleBarcodeScan
-        @this.call('handleBarcodeScan', decodedText);
+        // Trigger Livewire handleBarcodeScan via the global wrapper
+        if (typeof window.handleBarcodeScan === 'function') {
+            window.handleBarcodeScan(decodedText);
+        }
         
-        // 3 detik delay sebelum bisa scan lagi
+        // Stop scanning immediately on success to prevent duplicates
+        if (window.html5QrCode) {
+            const tempScanner = window.html5QrCode;
+            window.html5QrCode = null;
+            if (tempScanner.isScanning) {
+                tempScanner.stop().then(() => {
+                    console.log("Scanner stopped on success.");
+                }).catch(error => {
+                    console.error("Failed to stop scanner on success: ", error);
+                });
+            }
+        }
+        
+        // Tutup camera scanner secara otomatis setelah 1 detik
         setTimeout(() => {
-            scanDelay = false;
-            feedback.classList.remove('flex');
-            feedback.classList.add('hidden');
-        }, 3000);
+            document.getElementById('camera-modal').classList.add('hidden');
+            document.getElementById('camera-modal').classList.remove('flex');
+            window.scanDelay = false;
+            if (feedback) {
+                feedback.classList.remove('flex');
+                feedback.classList.add('hidden');
+            }
+        }, 1000);
     }
 
     function onScanFailure(error) {
@@ -621,6 +741,23 @@
     }
 
     async function printBluetooth(orderId) {
+        // Cek HTTPS/Secure Context (Syarat wajib Web Bluetooth API)
+        if (!window.isSecureContext && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+            Swal.fire({
+                title: 'Bluetooth Diblokir Browser',
+                html: '<div class="text-sm text-left">Browser memblokir akses Bluetooth karena koneksi bukan HTTPS.<br><br><b>Solusi:</b><br>1. Gunakan HTTPS (ngrok/Cloudflare)<br>2. Atau ketik <code>chrome://flags/#unsafely-treat-insecure-origin-as-secure</code> di Chrome HP Anda, isi IP komputer ini dan ubah ke <b>Enabled</b>.</div>',
+                icon: 'warning',
+                confirmButtonColor: '#3b82f6',
+                customClass: { popup: 'rounded-2xl' }
+            });
+            return;
+        }
+
+        if (!navigator.bluetooth) {
+            Swal.fire('Error', 'Browser Anda tidak mendukung Web Bluetooth API.', 'error');
+            return;
+        }
+
         try {
             // Meminta device bluetooth (hanya yang mendukung Serial Port Profile / printer)
             const device = await navigator.bluetooth.requestDevice({

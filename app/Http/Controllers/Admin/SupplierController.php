@@ -25,6 +25,10 @@ class SupplierController extends Controller
             ->paginate(15)
             ->withQueryString();
 
+        if ($request->ajax()) {
+            return view('admin.suppliers._table', compact('suppliers'))->render();
+        }
+
         return view('admin.suppliers.index', compact('suppliers'));
     }
 

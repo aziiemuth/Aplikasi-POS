@@ -45,10 +45,12 @@
                     </div>
                 </div>
                 <input type="file" name="foto" id="foto" accept="image/*" class="hidden" onchange="previewFoto(this)">
-                <button type="button" onclick="document.getElementById('foto').click()"
-                    class="w-full text-xs text-slate-500 border border-slate-200 rounded-xl py-2 hover:bg-slate-50 transition-colors">
-                    <i class="fa-solid fa-upload mr-1"></i> Pilih Foto
-                </button>
+                <div class="text-center">
+                    <button type="button" onclick="document.getElementById('foto').click()"
+                        class="inline-flex px-6 text-xs text-slate-500 border border-slate-200 rounded-xl py-2 hover:bg-slate-50 transition-colors">
+                        <i class="fa-solid fa-upload mr-1"></i> Pilih Foto
+                    </button>
+                </div>
             </div>
 
             {{-- === FASE 3.2: SKU / Barcode Generator === --}}
@@ -79,16 +81,16 @@
                 </div>
 
                 {{-- === FASE 3.2: Scan via Kamera === --}}
-                <div class="mt-3 pt-3 border-t border-slate-100">
+                <div class="mt-3 pt-3 border-t border-slate-100 text-center">
                     <button type="button" id="btn-scan-camera" onclick="toggleCamera()"
-                        class="w-full text-xs flex items-center justify-center gap-2 text-slate-600 border border-slate-200 rounded-xl py-2.5 hover:bg-slate-50 transition-colors">
+                        class="inline-flex items-center justify-center px-5 gap-2 text-xs text-slate-600 border border-slate-200 rounded-xl py-2.5 hover:bg-slate-50 transition-colors">
                         <i class="fa-solid fa-camera text-blue-500"></i>
-                        Scan via Kamera HP / Webcam
+                        Scan via Kamera HP
                     </button>
-                    <div id="camera-container" class="hidden mt-3">
-                        <div id="reader" class="rounded-xl overflow-hidden"></div>
+                    <div id="camera-container" class="hidden mt-3 text-center">
+                        <div id="reader" class="rounded-xl overflow-hidden mb-2"></div>
                         <button type="button" onclick="stopCamera()"
-                            class="mt-2 w-full text-xs text-red-500 border border-red-200 rounded-xl py-2 hover:bg-red-50 transition-colors">
+                            class="inline-flex items-center justify-center px-5 text-xs text-red-500 border border-red-200 rounded-xl py-2 hover:bg-red-50 transition-colors">
                             <i class="fa-solid fa-stop mr-1"></i> Stop Kamera
                         </button>
                     </div>
@@ -176,7 +178,7 @@
                 </div>
 
                 {{-- Live Laba Kalkulator --}}
-                <div id="laba-info" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 flex items-center gap-3">
+                <div id="laba-info" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 items-center gap-3">
                     <i class="fa-solid fa-chart-line text-emerald-500"></i>
                     <div class="text-sm">
                         <span class="text-slate-600">Laba per unit: </span>
@@ -216,12 +218,12 @@
             </div>
 
             {{-- Submit --}}
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3 pt-2">
                 <button type="submit"
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm px-8 py-3 rounded-xl shadow-sm hover:-translate-y-0.5 transition-all flex items-center gap-2">
-                    <i class="fa-solid fa-floppy-disk"></i> Simpan Produk
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm px-6 py-2.5 rounded-xl shadow-sm hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-floppy-disk"></i> Simpan
                 </button>
-                <a href="{{ route('admin.products.index') }}" class="text-slate-500 hover:text-slate-700 text-sm px-4 py-3 rounded-xl hover:bg-slate-100 transition-colors">Batal</a>
+                <a href="{{ route('admin.products.index') }}" class="text-slate-500 hover:text-slate-700 text-sm px-5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">Batal</a>
             </div>
         </div>
     </div>
@@ -345,14 +347,15 @@ function hitungLaba() {
     const pct = hpp > 0 ? ((laba / hpp) * 100).toFixed(1) : 0;
 
     const box = document.getElementById('laba-info');
-    const amtEl = document.getElementById('laba-amount');
-    const pctEl = document.getElementById('laba-pct');
-
     if (jual > 0 || hpp > 0) {
         box.classList.remove('hidden');
-        amtEl.textContent = 'Rp ' + laba.toLocaleString('id-ID');
-        pctEl.textContent = '(' + pct + '%)';
-        amtEl.className = 'font-bold ' + (laba >= 0 ? 'text-emerald-700' : 'text-red-600');
+        box.classList.add('flex');
+        document.getElementById('laba-amount').textContent = 'Rp ' + laba.toLocaleString('id-ID');
+        document.getElementById('laba-pct').textContent = '(' + pct + '%)';
+        document.getElementById('laba-amount').className = 'font-bold ' + (laba >= 0 ? 'text-emerald-700' : 'text-red-600');
+    } else {
+        box.classList.add('hidden');
+        box.classList.remove('flex');
     }
 }
 

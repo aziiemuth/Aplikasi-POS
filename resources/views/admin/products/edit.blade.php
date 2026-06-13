@@ -42,15 +42,15 @@
 
                 <input type="file" name="foto" id="foto" accept="image/*" class="hidden" onchange="previewFoto(this)">
 
-                <div class="space-y-2">
+                <div class="space-y-2 text-center">
                     <button type="button" onclick="document.getElementById('foto').click()"
-                        class="w-full text-xs text-blue-600 border border-blue-200 rounded-xl py-2 hover:bg-blue-50 transition-colors">
+                        class="inline-flex px-6 text-xs text-blue-600 border border-blue-200 rounded-xl py-2 hover:bg-blue-50 transition-colors">
                         <i class="fa-solid fa-upload mr-1"></i> Ganti Foto
                     </button>
                     @if($product->foto)
                     {{-- Hapus foto via fetch() agar tidak nested form --}}
                     <button type="button" onclick="hapusFotoProduk()"
-                        class="w-full text-xs text-red-500 border border-red-200 rounded-xl py-2 hover:bg-red-50 transition-colors">
+                        class="inline-flex px-6 text-xs text-red-500 border border-red-200 rounded-xl py-2 hover:bg-red-50 transition-colors">
                         <i class="fa-solid fa-trash mr-1"></i> Hapus Foto
                     </button>
                     @endif
@@ -139,7 +139,7 @@
                     </div>
                 </div>
 
-                <div id="laba-info" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 flex items-center gap-3">
+                <div id="laba-info" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 items-center gap-3">
                     <i class="fa-solid fa-chart-line text-emerald-500"></i>
                     <div class="text-sm">
                         <span class="text-slate-600">Laba per unit: </span>
@@ -165,12 +165,12 @@
                 </div>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3 pt-2">
                 <button type="submit"
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm px-8 py-3 rounded-xl shadow-sm hover:-translate-y-0.5 transition-all flex items-center gap-2">
-                    <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm px-6 py-2.5 rounded-xl shadow-sm hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-floppy-disk"></i> Simpan
                 </button>
-                <a href="{{ route('admin.products.show', $product) }}" class="text-slate-500 text-sm px-4 py-3 rounded-xl hover:bg-slate-100 transition-colors">Batal</a>
+                <a href="{{ route('admin.products.show', $product) }}" class="text-slate-500 text-sm px-5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">Batal</a>
             </div>
         </div>
     </div>
@@ -199,9 +199,13 @@ function hitungLaba() {
     const box = document.getElementById('laba-info');
     if(jual > 0 || hpp > 0) {
         box.classList.remove('hidden');
+        box.classList.add('flex');
         document.getElementById('laba-amount').textContent = 'Rp '+laba.toLocaleString('id-ID');
         document.getElementById('laba-pct').textContent = '('+pct+'%)';
         document.getElementById('laba-amount').className = 'font-bold '+(laba>=0?'text-emerald-700':'text-red-600');
+    } else {
+        box.classList.add('hidden');
+        box.classList.remove('flex');
     }
 }
 window.addEventListener('DOMContentLoaded', hitungLaba);

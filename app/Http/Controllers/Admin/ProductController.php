@@ -38,6 +38,10 @@ class ProductController extends Controller
             ->paginate(15)
             ->withQueryString();
 
+        if ($request->ajax()) {
+            return view('admin.products._table', compact('products'))->render();
+        }
+
         $categories = Category::active()->orderBy('nama_kategori')->get();
 
         return view('admin.products.index', compact('products', 'categories'));

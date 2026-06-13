@@ -43,7 +43,8 @@
     </div>
 
     <div class="bg-white rounded-2xl shadow-sm border border-surface-200 overflow-hidden">
-        <table class="w-full text-sm">
+        <div class="overflow-x-auto w-full">
+            <table class="w-full text-sm min-w-[900px]">
             <thead class="bg-slate-50 border-b border-slate-100">
                 <tr>
                     <th class="text-left px-5 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Tanggal</th>
@@ -115,6 +116,8 @@
                 @endforelse
             </tbody>
         </table>
+
+        </div>
 
         @if($mutations->hasPages())
         <div class="px-6 py-4 border-t border-slate-100">{{ $mutations->links() }}</div>
