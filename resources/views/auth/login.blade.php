@@ -22,6 +22,7 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    borderRadius: { '4xl': '2rem' },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
                         'fade-up': 'fadeUp 0.6s ease-out forwards',
@@ -87,9 +88,9 @@
     {{-- Login Card Container --}}
     <div class="w-full max-w-md relative animate-fade-up">
         <!-- Glow effect behind the card -->
-        <div class="absolute inset-0 card-glow-gradient rounded-[2rem] blur-2xl opacity-15 -z-10 animate-pulse-slow"></div>
+        <div class="absolute inset-0 card-glow-gradient rounded-4xl blur-2xl opacity-15 -z-10 animate-pulse-slow"></div>
         
-        <div class="bg-white rounded-[2rem] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] border border-slate-100 overflow-hidden">
+        <div class="bg-white rounded-4xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] border border-slate-100 overflow-hidden">
             
             {{-- Logo and Title Header --}}
             <div class="px-8 pt-10 pb-5 text-center">
