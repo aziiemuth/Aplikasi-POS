@@ -35,12 +35,14 @@ Fase ini berfokus pada persiapan awal proyek dan pembuatan struktur database yan
 
 2. **Perancangan Database (Migrations & Integritas)**
     - Wajib mengimplementasikan **Soft Deletes** pada tabel `products` dan `users`. Jika produk/kasir dihapus oleh Admin, datanya tidak terhapus permanen dari _database_, melainkan hanya disembunyikan. Ini sangat krusial agar riwayat struk/laporan transaksi lama tidak _error_ atau hilang.
-    - Buat file migration dengan struktur yang rapi untuk tabel-tabel berikut:
+    - Buat file migration dengan skema **Relasi Antar Tabel (Foreign Keys)** yang ketat (*Referential Integrity*) untuk tabel-tabel berikut:
         - `users`: id, nama, username, password, role/hak_akses, timestamps, deleted_at.
-        - `products` (Master Data): id, sku/barcode, kategori, satuan, nama, deskripsi, modal_hpp, harga_jual, stok_saat_ini, foto, timestamps, deleted_at.
-        - `stock_mutations` (Kartu Stok): id, product_id, tipe (masuk/keluar), jumlah, harga_beli, supplier_id, timestamps.
-        - `orders` (Transaksi): id, user_id (kasir yang melayani), nomor_order, nama_customer, total_sebelum_diskon, diskon_global, pajak_ppn, total_pembayaran, metode_pembayaran, jumlah_bayar, kembalian, status (lunas/open bill), timestamps.
-        - `order_items` (Detail Pesanan): id, order_id, product_id, harga_jual_snapshot, hpp_snapshot, diskon_item, jumlah, total_harga_item, timestamps.
+        - `categories` (Kategori Produk): id, nama_kategori, deskripsi, timestamps.
+        - `suppliers` (Data Pemasok): id, nama_supplier, kontak, alamat, timestamps.
+        - `products` (Master Data): id, category_id (FK), sku/barcode, satuan, nama, deskripsi, modal_hpp, harga_jual, stok_saat_ini, foto, timestamps, deleted_at.
+        - `stock_mutations` (Kartu Stok): id, product_id (FK), user_id (FK - Siapa yg merubah), order_id (FK - Opsional, referensi jika stok keluar karena terjual), tipe (masuk/keluar), jumlah, harga_beli, supplier_id (FK - Opsional), timestamps.
+        - `orders` (Transaksi): id, user_id (FK - Kasir yg melayani), nomor_order, nama_customer, total_sebelum_diskon, diskon_global, pajak_ppn, total_pembayaran, metode_pembayaran, jumlah_bayar, kembalian, status (lunas/open_bill), timestamps.
+        - `order_items` (Detail Pesanan): id, order_id (FK), product_id (FK), harga_jual_snapshot, hpp_snapshot, diskon_item, jumlah, total_harga_item, timestamps.
         - `carts` (Keranjang Sementara): id, user_id, product_id, jumlah, diskon_item, timestamps.
         - `activity_logs` (Rekam Jejak Aktivitas): id, user_id, aksi, deskripsi, ip_address, timestamps.
         - `failed_jobs`: Untuk log sistem (biasanya bawaan framework).
@@ -107,10 +109,10 @@ Fase ini merupakan ruang kerja utama Kasir untuk melakukan _checkout_.
     - Di antarmuka POS, terdapat fitur **Tab/Filter Kategori Produk** (data kategorinya di-_setting_ sebelumnya oleh Admin/Owner di Master Data).
     - Kasir tidak perlu repot men-_scroll_ panjang ke bawah atau mengetik nama satu per satu. Cukup dengan mengklik tombol kategori (misal: "Minuman Dingin" atau "Makanan Ringan"), daftar barang di layar langsung terfilter sesuai kelompoknya secara instan.
 
-3. **Keranjang Belanja Canggih**
+3. **Keranjang Belanja & Fitur Kasir Tingkat Lanjut**
     - Perhitungan subtotal per item dan kalkulator kembalian otomatis.
-    - Riwayat **Open Bill**: Fitur simpan sementara untuk pelanggan yang membayarnya nanti.
-    - **Alert Stok Habis**: Sistem akan memberikan notifikasi (_alert_) peringatan langsung di layar POS kepada kasir apabila barang yang di-scan atau dipilih stoknya sudah kosong/habis.
+    - **Riwayat Open Bill (Hold Transaction)**: Jika pelanggan belum siap bayar (misal dompet tertinggal), Kasir bisa menekan tombol "Hold/Open Bill". Sistem akan memindahkan data dari Keranjang Sementara ke tabel `orders` dengan status `open_bill`, sehingga Kasir bisa melayani pelanggan antrean berikutnya tanpa kehilangan data transaksi sebelumnya.
+    - **Larangan Stok Minus (Negative Stock)**: Sistem akan memberikan *alert* merah peringatan langsung di layar POS apabila barang yang di-scan stoknya 0 (kosong). Kasir **DILARANG KERAS** dan diblokir sistem untuk menjual barang dengan stok kosong demi menjaga agar rumus Akuntansi (HPP) tidak hancur/minus.
 
 4. **Diskon Ganda & Pembayaran Fleksibel**
     - Diskon spesifik per-item dan diskon nominal global.
