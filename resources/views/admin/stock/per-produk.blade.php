@@ -8,7 +8,7 @@
 
     {{-- Header Produk --}}
     <div class="bg-white rounded-2xl shadow-sm border border-surface-200 p-5 flex items-center gap-4">
-        <div class="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+        <div class="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center overflow-hidden shrink-0">
             @if($product->foto)
                 <img src="{{ Storage::url($product->foto) }}" class="w-full h-full object-contain">
             @else

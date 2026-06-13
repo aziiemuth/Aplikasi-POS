@@ -61,7 +61,7 @@
                     {{-- Avatar + Name + Email --}}
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full {{ $user->isAdmin() ? 'bg-amber-500' : 'bg-blue-600' }} flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                            <div class="w-9 h-9 rounded-full {{ $user->isAdmin() ? 'bg-amber-500' : 'bg-blue-600' }} flex items-center justify-center text-white font-bold text-sm shrink-0">
                                 {{ strtoupper(substr($user->name, 0, 1)) }}
                             </div>
                             <div>

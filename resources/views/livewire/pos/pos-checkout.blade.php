@@ -83,7 +83,7 @@
                                 Rp {{ number_format($bill['total_pembayaran'], 0, ',', '.') }}
                             </p>
                         </div>
-                        <div class="flex gap-2 flex-shrink-0">
+                        <div class="flex gap-2 shrink-0">
                             <button wire:click="resumeOpenBill({{ $bill['id'] }})"
                                 class="px-3 py-1.5 text-xs font-semibold bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-1">
                                 <i class="fa-solid fa-play text-xs"></i> Lanjut
@@ -100,7 +100,7 @@
             @endif
 
             {{-- Filter Kategori --}}
-            <div class="flex gap-2 overflow-x-auto pos-scroll hide-scrollbar pb-1 flex-shrink-0">
+            <div class="flex gap-2 overflow-x-auto pos-scroll hide-scrollbar pb-1 shrink-0">
                 <button wire:click="setCategory(null)"
                     class="whitespace-nowrap px-4 py-2 text-sm font-semibold rounded-xl transition-all
                     {{ is_null($categoryId) ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
@@ -167,7 +167,7 @@
         <div class="w-full lg:w-1/3 flex flex-col h-full bg-white rounded-2xl shadow-sm border border-surface-200 overflow-hidden">
 
             {{-- Header Keranjang --}}
-            <div class="p-4 bg-slate-800 text-white flex justify-between items-center flex-shrink-0">
+            <div class="p-4 bg-slate-800 text-white flex justify-between items-center shrink-0">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-cart-shopping text-blue-400"></i>
                     <h2 class="font-bold">Keranjang</h2>
@@ -250,7 +250,7 @@
             </div>
 
             {{-- Ringkasan & Tombol Aksi --}}
-            <div class="bg-white border-t border-slate-200 p-4 space-y-3 flex-shrink-0">
+            <div class="bg-white border-t border-slate-200 p-4 space-y-3 shrink-0">
 
                 {{-- Diskon Global --}}
                 <div x-data="{ editGlobal: false }">
@@ -458,7 +458,7 @@
 
     {{-- FASE 6: MODAL STRUK TRANSAKSI --}}
     @if($showReceiptModal && $receiptOrderId)
-    <div class="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm px-4 animate-fade-in">
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm px-4 animate-fade-in">
         <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
                 <h3 class="font-bold text-slate-800 flex items-center gap-2">

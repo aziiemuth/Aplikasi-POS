@@ -90,7 +90,7 @@
 
             {{-- Info --}}
             <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-xs text-blue-700 flex items-start gap-2">
-                <i class="fa-solid fa-circle-info mt-0.5 flex-shrink-0"></i>
+                <i class="fa-solid fa-circle-info mt-0.5 shrink-0"></i>
                 <p>Kasir <strong>hanya</strong> bisa mengakses layar POS. Admin memiliki akses penuh ke semua fitur sistem termasuk laporan dan master data.</p>
             </div>
 

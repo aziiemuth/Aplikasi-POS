@@ -10,7 +10,7 @@
 
     {{-- Logo / App Name --}}
     <div class="flex items-center gap-3 px-6 py-5 border-b border-slate-700">
-        <div class="w-9 h-9 bg-primary-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+        <div class="w-9 h-9 bg-primary-500 rounded-xl flex items-center justify-center shrink-0 shadow-lg">
             <i class="fa-solid fa-cash-register text-white text-base"></i>
         </div>
         <div>
@@ -139,7 +139,7 @@
     <div class="mt-auto border-t border-slate-700 bg-slate-800/40">
         {{-- User Info --}}
         <div class="flex items-center gap-3 px-6 py-4">
-            <div class="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0 text-white font-bold text-sm shadow">
+            <div class="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center shrink-0 text-white font-bold text-sm shadow">
                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
             </div>
             <div class="min-w-0">

@@ -8,6 +8,23 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property int|null $category_id
+ * @property string $sku
+ * @property string $nama_produk
+ * @property string|null $deskripsi
+ * @property string $satuan
+ * @property float $modal_hpp
+ * @property float $harga_jual
+ * @property int $stok_saat_ini
+ * @property int $stok_minimum
+ * @property string|null $foto
+ * @property bool $is_active
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property \Carbon\Carbon|null $deleted_at
+ */
 class Product extends Model
 {
     use HasFactory, SoftDeletes;

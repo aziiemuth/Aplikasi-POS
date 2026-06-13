@@ -66,7 +66,7 @@ class StockService
                 }
 
                 // Auto-update HPP di master produk (Fase 3.4: Pembaruan Otomatis)
-                $product->modal_hpp = round($hppBaru, 2);
+                $product->modal_hpp = round((float) $hppBaru, 2);
             }
 
             // Update stok produk

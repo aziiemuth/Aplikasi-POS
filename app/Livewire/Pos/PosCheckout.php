@@ -390,7 +390,7 @@ class PosCheckout extends Component
             $this->resetCheckoutForm();
             unset($this->carts);
 
-            $kembalian = number_format($order->kembalian, 0, ',', '.');
+            $kembalian = number_format((float) $order->kembalian, 0, ',', '.');
             $this->dispatch('swal',
                 title: 'Transaksi Berhasil! 🎉',
                 text: "Order #{$order->nomor_order} | Kembalian: Rp {$kembalian}",

@@ -32,7 +32,7 @@
         @forelse($categories as $cat)
         <div class="bg-white rounded-2xl shadow-sm border {{ $cat->is_active ? 'border-surface-200' : 'border-slate-200 opacity-60' }} p-5 hover:shadow-md transition-all group">
             <div class="flex items-start justify-between mb-3">
-                <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0
+                <div class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0
                     {{ $cat->is_active ? 'bg-blue-100' : 'bg-slate-100' }}">
                     <i class="{{ $cat->icon ?? 'fa-solid fa-tag' }} {{ $cat->is_active ? 'text-blue-600' : 'text-slate-400' }} text-lg"></i>
                 </div>

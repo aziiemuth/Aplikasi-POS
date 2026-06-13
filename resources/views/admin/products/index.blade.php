@@ -65,7 +65,7 @@
                     {{-- Foto + Nama --}}
                     <td class="px-5 py-3">
                         <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
                                 @if($product->foto)
                                     <img src="{{ Storage::url($product->foto) }}" class="w-full h-full object-contain" alt="{{ $product->nama_produk }}">
                                 @else

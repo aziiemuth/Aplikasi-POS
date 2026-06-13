@@ -43,7 +43,7 @@
                     <input type="text" name="icon" id="icon-input" value="{{ old('icon', 'fa-solid fa-tag') }}"
                         placeholder="fa-solid fa-tag"
                         class="form-input flex-1">
-                    <div class="w-11 h-11 border border-slate-200 rounded-xl flex items-center justify-center bg-blue-50 flex-shrink-0">
+                    <div class="w-11 h-11 border border-slate-200 rounded-xl flex items-center justify-center bg-blue-50 shrink-0">
                         <i id="icon-preview" class="{{ old('icon', 'fa-solid fa-tag') }} text-blue-600 text-xl"></i>
                     </div>
                 </div>

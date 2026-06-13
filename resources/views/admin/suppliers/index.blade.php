@@ -44,7 +44,7 @@
                 <tr class="hover:bg-slate-50/50 transition-colors">
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-xl bg-violet-100 flex items-center justify-center flex-shrink-0">
+                            <div class="w-9 h-9 rounded-xl bg-violet-100 flex items-center justify-center shrink-0">
                                 <i class="fa-solid fa-truck text-violet-600 text-sm"></i>
                             </div>
                             <div>

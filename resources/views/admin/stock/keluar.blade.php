@@ -33,7 +33,7 @@
         {{-- Peringatan --}}
         <div class="px-8 pt-5">
             <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-xs text-amber-800 flex items-start gap-2">
-                <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5 flex-shrink-0"></i>
+                <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5 shrink-0"></i>
                 <div>
                     <p class="font-semibold mb-0.5">Fase 3.3 — Stok Keluar Dikendalikan Ketat</p>
                     <p>Stok keluar karena <strong>penjualan</strong> dilakukan otomatis oleh sistem POS saat transaksi checkout (Fase 4).

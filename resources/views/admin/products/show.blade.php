@@ -189,7 +189,7 @@
                 <div class="divide-y divide-slate-50">
                     @forelse($mutasiTerbaru as $m)
                     <div class="flex items-center gap-3 px-6 py-3">
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0
                             {{ $m->tipe === 'masuk' ? 'bg-emerald-100' : 'bg-rose-100' }}">
                             <i class="fa-solid {{ $m->tipe === 'masuk' ? 'fa-arrow-down text-emerald-600' : 'fa-arrow-up text-rose-600' }} text-sm"></i>
                         </div>
@@ -200,7 +200,7 @@
                             </p>
                             <p class="text-xs text-slate-400 truncate">{{ $m->keterangan }}</p>
                         </div>
-                        <div class="text-right flex-shrink-0">
+                        <div class="text-right shrink-0">
                             @if($m->tipe === 'masuk' && $m->harga_beli)
                             <p class="text-xs text-violet-600 font-mono">Rp {{ number_format($m->harga_beli, 0, ',', '.') }}/{{ $product->satuan }}</p>
                             @endif

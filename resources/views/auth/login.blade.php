@@ -107,7 +107,7 @@
                 {{-- Alert Error --}}
                 @if ($errors->any() || session('error'))
                 <div class="mb-5 flex items-start gap-3 bg-red-50 border border-red-100 rounded-2xl p-4">
-                    <i class="fa-solid fa-circle-exclamation text-red-500 mt-0.5 flex-shrink-0"></i>
+                    <i class="fa-solid fa-circle-exclamation text-red-500 mt-0.5 shrink-0"></i>
                     <div class="text-sm text-red-700 font-medium leading-relaxed">
                         @foreach($errors->all() as $error)
                             <p>{{ $error }}</p>
