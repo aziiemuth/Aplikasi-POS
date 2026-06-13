@@ -9,7 +9,7 @@
         <div class="min-w-0 flex-1">
             <h2 class="text-sm sm:text-lg font-bold text-slate-800 leading-tight truncate">@yield('page-title', 'Dashboard')</h2>
             <p class="text-[10px] sm:text-xs text-slate-400 truncate mt-0.5">
-                @yield('page-subtitle', 'Selamat datang, ' . auth()->user()->name)
+                @yield('page-subtitle', 'Selamat datang, ' . (auth()->user()?->name ?? ''))
             </p>
         </div>
     </div>
@@ -26,9 +26,9 @@
         </div>
 
         {{-- Notifikasi Stok Tipis (Admin Only) --}}
-        @if(auth()->user()->isAdmin())
+        @if(auth()->user()?->isAdmin())
             @php
-                $lowStockCount = \App\Models\Product::active()->lowStock()->count();
+                $lowStockCount = \App\Models\Product::where('is_active', true)->whereColumn('stok_saat_ini', '<=', 'stok_minimum')->count();
             @endphp
             @if($lowStockCount > 0)
             <a href="{{ route('admin.products.index', ['stok' => 'tipis']) }}" 
@@ -36,14 +36,14 @@
                 title="{{ $lowStockCount }} stok tipis">
                 <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm sm:text-base"></i>
                 <span class="hidden sm:inline">{{ $lowStockCount }} stok tipis</span>
-                <span class="inline sm:hidden bg-amber-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center absolute -top-1.5 -right-1.5 border border-white shadow-sm">{{ $lowStockCount }}</span>
+                <span class="sm:hidden bg-amber-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center absolute -top-1.5 -right-1.5 border border-white shadow-sm">{{ $lowStockCount }}</span>
             </a>
             @endif
         @endif
 
         {{-- Avatar --}}
         <div class="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-md cursor-pointer shrink-0">
-            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+            {{ strtoupper(substr(auth()->user()?->name ?? 'U', 0, 1)) }}
         </div>
     </div>
 </header>
