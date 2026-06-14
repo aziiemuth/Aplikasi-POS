@@ -22,7 +22,7 @@
             </div>
             <div class="min-w-0">
                 <p class="text-blue-100 text-[11px] sm:text-xs font-medium">Omzet Hari Ini</p>
-                <p class="text-sm sm:text-xl font-bold text-white truncate">Rp {{ number_format($stats['omzet_hari_ini'], 0, ',', '.') }}</p>
+                <p class="text-sm sm:text-xl font-bold text-white truncate" title="Rp {{ number_format($stats['omzet_hari_ini'], 0, ',', '.') }}">Rp {{ number_format($stats['omzet_hari_ini'], 0, ',', '.') }}</p>
                 <p class="text-blue-200 text-[10px] sm:text-xs">{{ $stats['transaksi_hari_ini'] }} transaksi</p>
             </div>
         </div>
@@ -35,7 +35,7 @@
             </div>
             <div class="min-w-0">
                 <p class="text-emerald-100 text-[11px] sm:text-xs font-medium">Omzet Bulan Ini</p>
-                <p class="text-sm sm:text-xl font-bold text-white truncate">Rp {{ number_format($stats['omzet_bulan_ini'], 0, ',', '.') }}</p>
+                <p class="text-sm sm:text-xl font-bold text-white truncate" title="Rp {{ number_format($stats['omzet_bulan_ini'], 0, ',', '.') }}">Rp {{ number_format($stats['omzet_bulan_ini'], 0, ',', '.') }}</p>
                 <p class="text-emerald-200 text-[10px] sm:text-xs">{{ $stats['transaksi_bulan_ini'] }} transaksi</p>
             </div>
         </div>
@@ -48,7 +48,7 @@
             </div>
             <div class="min-w-0">
                 <p class="text-violet-100 text-[11px] sm:text-xs font-medium">Laba Hari Ini</p>
-                <p class="text-sm sm:text-xl font-bold text-white truncate">Rp {{ number_format($stats['laba_hari_ini'], 0, ',', '.') }}</p>
+                <p class="text-sm sm:text-xl font-bold text-white truncate" title="Rp {{ number_format($stats['laba_hari_ini'], 0, ',', '.') }}">Rp {{ number_format($stats['laba_hari_ini'], 0, ',', '.') }}</p>
                 <p class="text-violet-200 text-[10px] sm:text-xs">setelah HPP & diskon</p>
             </div>
         </div>
@@ -102,10 +102,10 @@
                         {{ $index + 1 }}
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-xs sm:text-sm font-semibold text-slate-700 truncate">{{ $item->nama_produk_snapshot }}</p>
+                        <p class="text-xs sm:text-sm font-semibold text-slate-700 truncate" title="{{ $item->nama_produk_snapshot }}">{{ $item->nama_produk_snapshot }}</p>
                         <p class="text-xs text-slate-400">{{ $item->total_terjual }} terjual</p>
                     </div>
-                    <p class="text-xs font-bold text-slate-600 shrink-0">Rp {{ number_format($item->total_omzet, 0, ',', '.') }}</p>
+                    <p class="text-xs font-bold text-slate-600 shrink-0 max-w-[80px] sm:max-w-none truncate text-right" title="Rp {{ number_format($item->total_omzet, 0, ',', '.') }}">Rp {{ number_format($item->total_omzet, 0, ',', '.') }}</p>
                 </div>
                 @empty
                 <div class="px-5 py-8 text-center">

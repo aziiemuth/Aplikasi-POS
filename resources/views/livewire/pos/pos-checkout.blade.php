@@ -154,7 +154,7 @@
                             <h3 class="text-xs font-semibold text-slate-800 line-clamp-2 leading-tight mb-1" title="{{ $p->nama_produk }}">
                                 {{ $p->nama_produk }}
                             </h3>
-                            <p class="text-blue-600 font-bold text-sm">Rp {{ number_format($p->harga_jual, 0, ',', '.') }}</p>
+                            <p class="text-blue-600 font-bold text-sm truncate" title="Rp {{ number_format($p->harga_jual, 0, ',', '.') }}">Rp {{ number_format($p->harga_jual, 0, ',', '.') }}</p>
                         </div>
                     </div>
                     @endforeach
@@ -171,9 +171,9 @@
                 <i class="fa-solid fa-basket-shopping text-lg"></i>
                 <span class="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border border-blue-600">{{ $carts->sum('jumlah') }}</span>
             </div>
-            <div class="flex flex-col items-start leading-tight">
-                <span class="text-[10px] font-medium text-blue-100">Checkout</span>
-                <span class="text-sm font-bold">Rp {{ number_format(max(0, $subtotal - $diskonGlobal + $pajakPpn), 0, ',', '.') }}</span>
+            <div class="flex flex-col items-start leading-tight min-w-0 max-w-[120px]">
+                <span class="text-[10px] font-medium text-blue-100 shrink-0">Checkout</span>
+                <span class="text-sm font-bold truncate w-full">Rp {{ number_format(max(0, $subtotal - $diskonGlobal + $pajakPpn), 0, ',', '.') }}</span>
             </div>
         </button>
 
@@ -242,11 +242,11 @@
                             </div>
 
                             {{-- Subtotal + Tombol Diskon Item --}}
-                            <div class="flex flex-col items-end gap-0.5">
+                            <div class="flex flex-col items-end gap-0.5 min-w-0 max-w-[110px]">
                                 @php $totalItem = ($c->product->harga_jual - $c->diskon_item) * $c->jumlah; @endphp
-                                <p class="font-bold text-slate-800 text-sm">Rp {{ number_format($totalItem, 0, ',', '.') }}</p>
+                                <p class="font-bold text-slate-800 text-sm truncate w-full text-right" title="Rp {{ number_format($totalItem, 0, ',', '.') }}">Rp {{ number_format($totalItem, 0, ',', '.') }}</p>
                                 {{-- Tombol edit diskon item (Fase 4.4) --}}
-                                <button @click="editDiskon = !editDiskon" class="text-[10px] text-blue-500 hover:underline flex items-center gap-0.5">
+                                <button @click="editDiskon = !editDiskon" class="text-[10px] text-blue-500 hover:underline flex items-center gap-0.5 shrink-0">
                                     <i class="fa-solid fa-percent text-[8px]"></i>
                                     {{ $c->diskon_item > 0 ? 'Edit diskon' : 'Tambah diskon' }}
                                 </button>
@@ -300,10 +300,10 @@
                 </div>
 
                 {{-- Total Akhir --}}
-                <div class="pt-2 border-t border-slate-100 flex justify-between items-end">
-                    <span class="text-slate-500 font-semibold mb-0.5">Total Akhir</span>
+                <div class="pt-2 border-t border-slate-100 flex justify-between items-end gap-2">
+                    <span class="text-slate-500 font-semibold mb-0.5 shrink-0">Total Akhir</span>
                     @php $totalAkhir = $subtotal - $diskonGlobal + $pajakPpn; @endphp
-                    <span class="text-2xl font-bold text-blue-600">Rp {{ number_format(max(0, $totalAkhir), 0, ',', '.') }}</span>
+                    <span class="text-xl sm:text-2xl font-bold text-blue-600 truncate text-right" title="Rp {{ number_format(max(0, $totalAkhir), 0, ',', '.') }}">Rp {{ number_format(max(0, $totalAkhir), 0, ',', '.') }}</span>
                 </div>
 
                 {{-- Tombol Hold + Bayar --}}
@@ -356,10 +356,10 @@
 
                 <div class="px-6 py-5 space-y-4">
                     {{-- Total Tagihan --}}
-                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-center">
+                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-center px-2">
                         <p class="text-sm text-blue-600 font-semibold mb-1">Total Tagihan</p>
                         @php $totalAkhir = $subtotal - $diskonGlobal + $pajakPpn; @endphp
-                        <p class="text-3xl font-bold text-blue-800">Rp {{ number_format(max(0, $totalAkhir), 0, ',', '.') }}</p>
+                        <p class="text-2xl sm:text-3xl font-bold text-blue-800 break-words">Rp {{ number_format(max(0, $totalAkhir), 0, ',', '.') }}</p>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
@@ -384,7 +384,7 @@
                         <div class="relative">
                             <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">Rp</span>
                             <input type="number" wire:model.live="jumlahBayar"
-                                class="w-full bg-white border border-slate-300 rounded-xl pl-10 pr-4 py-3 text-lg font-bold text-slate-800 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all">
+                                class="w-full bg-white border border-slate-300 rounded-xl pl-10 pr-4 py-3 text-base sm:text-lg font-bold text-slate-800 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all">
                         </div>
 
                         {{-- Kalkulator Kembalian Otomatis --}}

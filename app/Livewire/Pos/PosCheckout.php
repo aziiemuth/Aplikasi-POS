@@ -143,6 +143,7 @@ class PosCheckout extends Component
                 return;
             }
             $cart->increment('jumlah');
+            ActivityLog::log('Tambah Jumlah Keranjang', "Kasir menambah qty {$product->nama_produk} di keranjang.");
         } else {
             Cart::create([
                 'user_id'     => auth()->id(),
@@ -150,6 +151,7 @@ class PosCheckout extends Component
                 'jumlah'      => 1,
                 'diskon_item' => 0,
             ]);
+            ActivityLog::log('Tambah ke Keranjang', "Kasir memasukkan {$product->nama_produk} ke keranjang.");
         }
 
         unset($this->carts);
@@ -167,10 +169,13 @@ class PosCheckout extends Component
                 return;
             }
             $cart->increment('jumlah');
+            ActivityLog::log('Ubah Qty Keranjang', "Kasir menambah qty {$cart->product->nama_produk} di keranjang.");
         } elseif ($action === 'decrease') {
             if ($cart->jumlah > 1) {
                 $cart->decrement('jumlah');
+                ActivityLog::log('Ubah Qty Keranjang', "Kasir mengurangi qty {$cart->product->nama_produk} di keranjang.");
             } else {
+                ActivityLog::log('Hapus Item Keranjang', "Kasir menghapus {$cart->product->nama_produk} dari keranjang.");
                 $cart->delete();
             }
         }
@@ -199,13 +204,18 @@ class PosCheckout extends Component
 
     public function removeItem($cartId)
     {
-        Cart::where('id', $cartId)->delete();
+        $cart = Cart::with('product')->find($cartId);
+        if ($cart) {
+            ActivityLog::log('Hapus Item Keranjang', "Kasir menghapus {$cart->product->nama_produk} dari keranjang.");
+            $cart->delete();
+        }
         unset($this->carts);
     }
 
     public function clearCart()
     {
         Cart::where('user_id', auth()->id())->delete();
+        ActivityLog::log('Kosongkan Keranjang', "Kasir mengosongkan seluruh keranjang belanja.");
         unset($this->carts);
     }
 
