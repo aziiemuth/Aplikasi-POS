@@ -160,4 +160,63 @@ class PengaturanController extends Controller
                 ->with('error', 'Import gagal: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Reset/bersihkan database kecuali tabel users (Fase testing).
+     */
+    public function resetDatabase(Request $request)
+    {
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('admin.pengaturan.index')
+                ->with('error', 'Hanya admin yang diperbolehkan untuk mereset database.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Disable foreign key checks
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+            // List of tables to clear
+            $tables = [
+                'order_items',
+                'orders',
+                'stock_mutations',
+                'carts',
+                'products',
+                'suppliers',
+                'categories',
+                'activity_logs',
+                'store_settings'
+            ];
+
+            // Hapus berkas logo jika ada
+            $logo = StoreSetting::get('logo');
+            if ($logo && Storage::disk('public')->exists($logo)) {
+                Storage::disk('public')->delete($logo);
+            }
+
+            // Truncate tables
+            foreach ($tables as $table) {
+                DB::table($table)->truncate();
+            }
+
+            // Enable foreign key checks
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+            DB::commit();
+
+            // Log activity after truncating logs so it is recorded fresh
+            ActivityLog::log('Reset Database', 'Admin melakukan reset/pembersihan seluruh data database (kecuali users).');
+
+            return redirect()->route('admin.pengaturan.index')
+                ->with('success', 'Database berhasil disetel ulang (kecuali data user)!');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+            return redirect()->route('admin.pengaturan.index')
+                ->with('error', 'Reset database gagal: ' . $e->getMessage());
+        }
+    }
 }

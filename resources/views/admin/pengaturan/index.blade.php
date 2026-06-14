@@ -272,6 +272,49 @@
     </div>{{-- end grid backup & import --}}
 
     {{-- ========================================================
+         SECTION 8.4 — ZONA BAHAYA / DANGER ZONE
+    ======================================================== --}}
+    <div class="bg-white rounded-2xl shadow-sm border border-rose-200 overflow-hidden">
+        <div class="bg-rose-600 px-4 sm:px-6 py-2.5 sm:py-3 flex items-center gap-3" style="background: linear-gradient(to right, #e11d48, #be123c)">
+            <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-triangle-exclamation text-white text-sm"></i>
+            </div>
+            <div>
+                <h2 class="text-white font-semibold text-sm sm:text-base leading-tight">Zona Bahaya (Testing)</h2>
+                <p class="text-rose-100 text-[11px] sm:text-xs">Tindakan ini tidak dapat dibatalkan</p>
+            </div>
+        </div>
+
+        <div class="p-4 sm:p-6">
+            <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 mb-4">
+                <div class="flex gap-3">
+                    <i class="fa-solid fa-triangle-exclamation text-rose-600 mt-0.5 shrink-0"></i>
+                    <div class="text-xs text-rose-800 space-y-1">
+                        <p class="font-bold">⚠️ PENTING: Apa yang terjadi saat database disetel ulang?</p>
+                        <p>Seluruh data transaksi, item penjualan, mutasi stok, keranjang kasir, data produk, kategori, supplier, dan log aktivitas akan **dihapus bersih (kosong)**.</p>
+                        <p class="font-semibold text-rose-700">Data Pengguna (User Accounts) tidak akan dihapus, sehingga Anda tetap bisa login kembali dengan akun yang sama.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                <div class="text-center sm:text-left">
+                    <p class="text-xs font-bold text-slate-700">Setel Ulang Seluruh Data Sistem</p>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Disarankan mengunduh backup database terlebih dahulu sebelum melakukan tindakan ini.</p>
+                </div>
+                <form id="form-reset-database" action="{{ route('admin.pengaturan.reset') }}" method="POST" class="w-full sm:w-auto">
+                    @csrf
+                    <button type="button" onclick="confirmResetDatabase()"
+                        class="w-full sm:w-auto flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs transition-all shadow hover:-translate-y-0.5">
+                        <i class="fa-solid fa-trash-can"></i>
+                        Kosongkan Database
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- ========================================================
          SECTION 8.3 — REQUEST FEATURE / BANTUAN TEKNIS
     ======================================================== --}}
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -359,6 +402,63 @@ function runBackup(btn) {
         btn.innerHTML = oldHtml;
         btn.classList.remove('opacity-75', 'pointer-events-none');
     }, 3000);
+}
+
+function confirmResetDatabase() {
+    Swal.fire({
+        title: 'Konfirmasi Reset Database',
+        html: '<div class="text-slate-600 text-sm">Apakah Anda yakin ingin <strong>menghapus bersih seluruh database</strong>?<br><br><span class="text-rose-500 font-bold text-sm">⚠️ TINDAKAN INI TIDAK DAPAT DIBATALKAN.</span><br><small class="text-slate-400 mt-2 block">Seluruh data produk, kategori, stok, supplier, log, dan riwayat transaksi akan dihapus secara permanen (Kecuali akun User/Kasir).</small></div>',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: '<i class="fa-solid fa-trash mr-1"></i> Ya, Reset Sekarang',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        width: '440px',
+        customClass: {
+            popup: 'rounded-2xl',
+            confirmButton: 'rounded-xl px-5 py-2 text-sm font-semibold',
+            cancelButton: 'rounded-xl px-5 py-2 text-sm font-semibold'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Verifikasi Terakhir',
+                text: 'Ketik "RESET" pada kolom di bawah untuk memverifikasi tindakan Anda:',
+                input: 'text',
+                inputPlaceholder: 'RESET',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Proses Reset',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                width: '420px',
+                customClass: {
+                    popup: 'rounded-2xl',
+                    confirmButton: 'rounded-xl px-5 py-2 text-sm font-semibold',
+                    cancelButton: 'rounded-xl px-5 py-2 text-sm font-semibold'
+                },
+                inputValidator: (value) => {
+                    if (value !== 'RESET') {
+                        return 'Anda harus mengetik "RESET" dengan huruf besar!';
+                    }
+                }
+            }).then((secondResult) => {
+                if (secondResult.isConfirmed && secondResult.value === 'RESET') {
+                    Swal.fire({
+                        title: 'Memproses...',
+                        text: 'Sedang menyetel ulang database Anda...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    document.getElementById('form-reset-database').submit();
+                }
+            });
+        }
+    });
 }
 </script>
 @endpush
