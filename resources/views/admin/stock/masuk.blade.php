@@ -30,12 +30,11 @@
             </div>
         </div>
 
-        {{-- Info FASE 3.4 --}}
         <div class="px-8 pt-5">
             <div class="bg-violet-50 border border-violet-200 rounded-xl px-4 py-3 text-xs text-violet-800 flex items-start gap-2">
                 <i class="fa-solid fa-calculator text-violet-500 mt-0.5 shrink-0"></i>
                 <div>
-                    <p class="font-semibold mb-0.5">Fase 3.4 — HPP Rata-rata Tertimbang Otomatis</p>
+                    <p class="font-semibold mb-0.5">HPP Rata-rata Tertimbang Otomatis</p>
                     <p>HPP Baru = ((Stok Lama × HPP Lama) + (Qty Masuk × Harga Beli)) ÷ Total Stok</p>
                     <p class="mt-1">Jika harga beli dikosongkan → HPP tidak berubah.</p>
                 </div>
@@ -163,7 +162,7 @@ function loadProductInfo(productId) {
     hitungHppBaru();
 }
 
-// === FASE 3.4: Preview HPP Rata-rata Tertimbang Langsung di Form ===
+// Preview HPP Rata-rata Tertimbang Langsung di Form
 function hitungHppBaru() {
     const jumlah    = parseFloat(document.getElementById('jumlah').value) || 0;
     const hargaBeli = parseFloat(document.getElementById('harga-beli').value) || 0;
