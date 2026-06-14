@@ -47,13 +47,15 @@ class StockService
     ): StockMutation {
         return DB::transaction(function () use ($product, $jumlah, $hargaBeli, $user, $supplier, $keterangan) {
 
-            $stokSebelum = $product->stok_saat_ini;
+            // Re-fetch product with lock to prevent race conditions (Concurrency fix)
+            $lockedProduct = Product::where('id', $product->id)->lockForUpdate()->first();
+            $stokSebelum = $lockedProduct->stok_saat_ini;
             $stokSesudah = $stokSebelum + $jumlah;
 
             // =====================================================
             // FASE 3.4: Hitung HPP Rata-rata Tertimbang
             // =====================================================
-            $hppLama   = (float) $product->modal_hpp;
+            $hppLama   = (float) $lockedProduct->modal_hpp;
             $hppBaru   = $hppLama; // default: tetap sama
 
             if ($hargaBeli !== null && $hargaBeli > 0) {
@@ -66,12 +68,12 @@ class StockService
                 }
 
                 // Auto-update HPP di master produk (Fase 3.4: Pembaruan Otomatis)
-                $product->modal_hpp = round((float) $hppBaru, 2);
+                $lockedProduct->modal_hpp = round((float) $hppBaru, 2);
             }
 
             // Update stok produk
-            $product->stok_saat_ini = $stokSesudah;
-            $product->save();
+            $lockedProduct->stok_saat_ini = $stokSesudah;
+            $lockedProduct->save();
 
             // =====================================================
             // FASE 3.3: Catat ke tabel stock_mutations (kartu stok)
@@ -96,14 +98,14 @@ class StockService
 
             ActivityLog::log(
                 'Stok Masuk',
-                "[{$product->nama_produk}] +{$jumlah} unit. Stok: {$stokSebelum} → {$stokSesudah}. {$hppInfo}",
-                $product
+                "[{$lockedProduct->nama_produk}] +{$jumlah} unit. Stok: {$stokSebelum} → {$stokSesudah}. {$hppInfo}",
+                $lockedProduct
             );
 
             // Invalidate cache produk
-            CacheService::forgetProductsByCategory((int) $product->category_id);
+            CacheService::forgetProductsByCategory((int) $lockedProduct->category_id);
 
-            broadcast(new \App\Events\StockUpdated($product->id, $product->stok_saat_ini));
+            broadcast(new \App\Events\StockUpdated($lockedProduct->id, $lockedProduct->stok_saat_ini));
 
             return $mutation;
         });
@@ -131,20 +133,23 @@ class StockService
     ): StockMutation {
         return DB::transaction(function () use ($product, $jumlah, $user, $keterangan) {
 
+            // Re-fetch product with lock
+            $lockedProduct = Product::where('id', $product->id)->lockForUpdate()->first();
+
             // === Fase 3.3: LARANGAN STOK MINUS ===
-            if ($product->stok_saat_ini < $jumlah) {
+            if ($lockedProduct->stok_saat_ini < $jumlah) {
                 throw new \Exception(
-                    "Stok {$product->nama_produk} tidak mencukupi! " .
-                    "Tersedia: {$product->stok_saat_ini}, diminta: {$jumlah}."
+                    "Stok {$lockedProduct->nama_produk} tidak mencukupi! " .
+                    "Tersedia: {$lockedProduct->stok_saat_ini}, diminta: {$jumlah}."
                 );
             }
 
-            $stokSebelum = $product->stok_saat_ini;
+            $stokSebelum = $lockedProduct->stok_saat_ini;
             $stokSesudah = $stokSebelum - $jumlah;
 
             // Update stok
-            $product->stok_saat_ini = $stokSesudah;
-            $product->save();
+            $lockedProduct->stok_saat_ini = $stokSesudah;
+            $lockedProduct->save();
 
             // Catat mutasi
             $mutation = StockMutation::create([
@@ -162,13 +167,13 @@ class StockService
 
             ActivityLog::log(
                 'Stok Keluar Manual',
-                "[{$product->nama_produk}] -{$jumlah} unit. Stok: {$stokSebelum} → {$stokSesudah}.",
-                $product
+                "[{$lockedProduct->nama_produk}] -{$jumlah} unit. Stok: {$stokSebelum} → {$stokSesudah}.",
+                $lockedProduct
             );
 
-            CacheService::forgetProductsByCategory((int) $product->category_id);
+            CacheService::forgetProductsByCategory((int) $lockedProduct->category_id);
 
-            broadcast(new \App\Events\StockUpdated($product->id, $product->stok_saat_ini));
+            broadcast(new \App\Events\StockUpdated($lockedProduct->id, $lockedProduct->stok_saat_ini));
 
             return $mutation;
         });
@@ -194,15 +199,18 @@ class StockService
     ): StockMutation {
         return DB::transaction(function () use ($product, $jumlah, $orderId, $userId) {
 
-            if ($product->stok_saat_ini < $jumlah) {
-                throw new \Exception("Stok {$product->nama_produk} tidak mencukupi untuk transaksi!");
+            // Re-fetch product with row-level locking (Penting untuk concurency kasir)
+            $lockedProduct = Product::where('id', $product->id)->lockForUpdate()->first();
+
+            if ($lockedProduct->stok_saat_ini < $jumlah) {
+                throw new \Exception("Stok {$lockedProduct->nama_produk} tidak mencukupi untuk transaksi!");
             }
 
-            $stokSebelum = $product->stok_saat_ini;
+            $stokSebelum = $lockedProduct->stok_saat_ini;
             $stokSesudah = $stokSebelum - $jumlah;
 
-            $product->stok_saat_ini = $stokSesudah;
-            $product->save();
+            $lockedProduct->stok_saat_ini = $stokSesudah;
+            $lockedProduct->save();
 
             $mutation = StockMutation::create([
                 'product_id'   => $product->id,
