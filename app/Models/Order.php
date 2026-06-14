@@ -7,6 +7,26 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Class Order
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property string $nomor_order
+ * @property string $nama_customer
+ * @property float $total_sebelum_diskon
+ * @property float $diskon_global
+ * @property float $pajak_ppn
+ * @property float $total_pembayaran
+ * @property string $metode_pembayaran
+ * @property float $jumlah_bayar
+ * @property float $kembalian
+ * @property string $status
+ * @property string|null $catatan
+ * @property float $laba_kotor
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ */
 class Order extends Model
 {
     use HasFactory;
