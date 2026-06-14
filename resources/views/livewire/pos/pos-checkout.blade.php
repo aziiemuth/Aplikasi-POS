@@ -116,7 +116,7 @@
                     </div>
                     <div class="space-y-2">
                         @foreach($openBills as $bill)
-                            <div class="bg-white rounded-xl border border-amber-100 px-4 py-3 flex items-center gap-3">
+                            <div class="bg-white rounded-xl border border-amber-100 px-4 py-3 flex items-center gap-3" wire:key="bill-{{ $bill['id'] }}">
                                 <div class="flex-1 min-w-0">
                                     <p class="text-sm font-semibold text-slate-800">{{ $bill['nomor_order'] }}</p>
                                     <p class="text-xs text-slate-500">
@@ -148,7 +148,7 @@
                     <i class="fa-solid fa-th-large mr-1"></i> Semua
                 </button>
                 @foreach($categories as $cat)
-                    <button wire:click="setCategory({{ $cat->id }})"
+                    <button wire:click="setCategory({{ $cat->id }})" wire:key="cat-{{ $cat->id }}"
                         class="whitespace-nowrap px-4 py-2 text-sm font-semibold rounded-xl transition-all flex items-center gap-1.5
                         {{ $categoryId === $cat->id ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
                         <i class="{{ $cat->icon ?? 'fa-solid fa-tag' }} text-xs"></i>
@@ -172,7 +172,7 @@
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 lg:gap-4 px-1">
                         @foreach($products as $p)
                             @php $stokKosong = $p->stok_saat_ini <= 0; @endphp
-                            <div wire:click="{{ $stokKosong ? '' : 'addToCart(' . $p->id . ')' }}"
+                            <div wire:click="{{ $stokKosong ? '' : 'addToCart(' . $p->id . ')' }}" wire:key="prod-{{ $p->id }}-{{ $p->stok_saat_ini }}"
                                 class="product-card bg-white rounded-2xl border border-surface-200 overflow-hidden shadow-sm
                                 {{ $stokKosong ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:shadow-md hover:-translate-y-1 group' }}">
 
@@ -265,7 +265,7 @@
                     </div>
                 @else
                     @foreach($carts as $c)
-                        <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-2 relative group cart-item-enter"
+                        <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-2 relative group cart-item-enter" wire:key="cart-{{ $c->id }}-{{ $c->jumlah }}"
                             x-data="{ editDiskon: false, diskonInput: {{ $c->diskon_item }} }">
 
                             {{-- Hapus Item --}}

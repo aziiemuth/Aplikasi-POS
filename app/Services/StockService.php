@@ -103,6 +103,8 @@ class StockService
             // Invalidate cache produk
             CacheService::forgetProductsByCategory((int) $product->category_id);
 
+            broadcast(new \App\Events\StockUpdated($product->id, $product->stok_saat_ini));
+
             return $mutation;
         });
     }
@@ -165,6 +167,8 @@ class StockService
             );
 
             CacheService::forgetProductsByCategory((int) $product->category_id);
+
+            broadcast(new \App\Events\StockUpdated($product->id, $product->stok_saat_ini));
 
             return $mutation;
         });

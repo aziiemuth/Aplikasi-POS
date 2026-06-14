@@ -124,7 +124,7 @@ class PosTransactionService
             foreach ($order->items as $item) {
                 $product = Product::find($item->product_id);
                 if ($product) {
-                    broadcast(new StockUpdated($product->id, $product->stok_saat_ini))->toOthers();
+                    broadcast(new StockUpdated($product->id, $product->stok_saat_ini));
                 }
             }
         } catch (\Throwable $e) {
