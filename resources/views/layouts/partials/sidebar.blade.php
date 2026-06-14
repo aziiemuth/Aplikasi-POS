@@ -145,6 +145,19 @@
         </div>
 
 
+        {{-- === FASE 8: Pengaturan Sistem === --}}
+        <div class="mb-3 pt-2 border-t border-slate-700/60 flex flex-col gap-1">
+            <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider px-3 mb-1.5">Sistem</p>
+
+            <a href="{{ route('admin.pengaturan.index') }}"
+               class="sidebar-link {{ request()->routeIs('admin.pengaturan.*') ? 'active' : '' }}">
+                <i class="fa-solid fa-gear w-5 text-center"></i>
+                <span>Pengaturan</span>
+            </a>
+
+
+        </div>
+
         @endif
 
     </nav>

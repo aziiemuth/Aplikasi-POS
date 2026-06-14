@@ -130,9 +130,16 @@
 <body>
     <div id="print-area" class="struk-container">
         <!-- Header Toko -->
+        @php
+            $s = \App\Models\StoreSetting::all_settings();
+        @endphp
         <div class="header text-center">
-            <h2>Toko Kita</h2>
-            <p>Jl. Contoh Alamat No. 123<br>Telp: 08123456789</p>
+            @if(!empty($s['logo']))
+                <img src="{{ Storage::url($s['logo']) }}" alt="Logo" style="max-height: 60px; max-width: 100%; object-fit: contain; margin: 0 auto 4px;">
+            @endif
+            <h2>{{ $s['nama_toko'] ?? 'Toko Kita' }}</h2>
+            <p>{{ $s['alamat'] ?? '' }}@if(!empty($s['kota'])), {{ $s['kota'] }}@endif<br>Telp: {{ $s['kontak'] ?? '-' }}</p>
+            @if(!empty($s['website']))<p style="font-size: 9px;">{{ $s['website'] }}</p>@endif
         </div>
 
         <!-- Info Transaksi -->
@@ -216,7 +223,7 @@
 
         <!-- Footer -->
         <div class="footer">
-            <p class="bold">Terima Kasih!</p>
+            <p class="bold">{{ $s['footer_struk'] ?? 'Terima Kasih!' }}</p>
             <p>Barang yang sudah dibeli<br>tidak dapat dikembalikan</p>
         </div>
     </div>
