@@ -206,6 +206,10 @@ class PengaturanController extends Controller
 
             DB::commit();
 
+            // Bersihkan cache POS & sistem agar perubahan langsung terlihat di kasir
+            \App\Services\CacheService::forgetAll();
+            \Illuminate\Support\Facades\Cache::flush();
+
             // Log activity after truncating logs so it is recorded fresh
             ActivityLog::log('Reset Database', 'Admin melakukan reset/pembersihan seluruh data database (kecuali users).');
 
