@@ -33,6 +33,14 @@ class PengaturanController extends Controller
     }
 
     /**
+     * Halaman Petunjuk Penggunaan
+     */
+    public function guide()
+    {
+        return view('admin.pengaturan.guide');
+    }
+
+    /**
      * Simpan pengaturan identitas toko.
      */
     public function updateIdentitas(Request $request)

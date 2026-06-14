@@ -30,20 +30,20 @@
 
             <a href="{{ route('kasir.pos') }}"
                class="sidebar-link {{ request()->routeIs('kasir.pos') ? 'active' : '' }}">
-                <i class="fa-solid fa-cash-register w-5 text-center"></i>
+                <i class="fa-solid fa-cash-register w-5 text-center text-blue-400"></i>
                 <span>Point of Sale</span>
             </a>
 
             <a href="{{ route('kasir.riwayat') }}"
                class="sidebar-link {{ request()->routeIs('kasir.riwayat') ? 'active' : '' }}">
-                <i class="fa-solid fa-clock-rotate-left w-5 text-center"></i>
+                <i class="fa-solid fa-clock-rotate-left w-5 text-center text-indigo-400"></i>
                 <span>Riwayat Transaksi</span>
             </a>
 
             @if(!auth()->user()->isAdmin())
             <a href="{{ route('kasir.tools.diagnostik') }}"
                class="sidebar-link {{ request()->routeIs('kasir.tools.diagnostik') ? 'active' : '' }}">
-                <i class="fa-solid fa-stethoscope w-5 text-center"></i>
+                <i class="fa-solid fa-stethoscope w-5 text-center text-teal-400"></i>
                 <span>Uji Alat Kasir</span>
             </a>
             @endif
@@ -58,13 +58,13 @@
 
             <a href="{{ route('admin.dashboard') }}"
                class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                <i class="fa-solid fa-gauge-high w-5 text-center"></i>
+                <i class="fa-solid fa-gauge-high w-5 text-center text-cyan-400"></i>
                 <span>Dashboard</span>
             </a>
 
             <a href="{{ route('admin.users.index') }}"
                class="sidebar-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-users w-5 text-center"></i>
+                <i class="fa-solid fa-users w-5 text-center text-sky-400"></i>
                 <span>Manajemen User</span>
             </a>
         </div>
@@ -75,19 +75,19 @@
 
             <a href="{{ route('admin.categories.index') }}"
                class="sidebar-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-tags w-5 text-center"></i>
+                <i class="fa-solid fa-tags w-5 text-center text-amber-400"></i>
                 <span>Kategori</span>
             </a>
 
             <a href="{{ route('admin.suppliers.index') }}"
                class="sidebar-link {{ request()->routeIs('admin.suppliers.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-truck w-5 text-center"></i>
+                <i class="fa-solid fa-truck w-5 text-center text-orange-400"></i>
                 <span>Supplier</span>
             </a>
 
             <a href="{{ route('admin.products.index') }}"
                class="sidebar-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-boxes-stacked w-5 text-center"></i>
+                <i class="fa-solid fa-boxes-stacked w-5 text-center text-violet-400"></i>
                 <span>Produk</span>
                 @php $lowStock = \App\Models\Product::active()->lowStock()->count(); @endphp
                 @if($lowStock > 0)
@@ -116,7 +116,7 @@
 
             <a href="{{ route('admin.stock.index') }}"
                class="sidebar-link {{ request()->routeIs('admin.stock.index') ? 'active' : '' }}">
-                <i class="fa-solid fa-clipboard-list w-5 text-center"></i>
+                <i class="fa-solid fa-clipboard-list w-5 text-center text-fuchsia-400"></i>
                 <span>Riwayat Mutasi</span>
             </a>
         </div>
@@ -127,19 +127,19 @@
 
             <a href="{{ route('admin.laporan.penjualan') }}"
                class="sidebar-link {{ request()->routeIs('admin.laporan.penjualan*') ? 'active' : '' }}">
-                <i class="fa-solid fa-chart-line w-5 text-center"></i>
+                <i class="fa-solid fa-chart-line w-5 text-center text-emerald-400"></i>
                 <span>Laporan Penjualan</span>
             </a>
 
             <a href="{{ route('admin.laporan.stok') }}"
                class="sidebar-link {{ request()->routeIs('admin.laporan.stok*') ? 'active' : '' }}">
-                <i class="fa-solid fa-clipboard-list w-5 text-center"></i>
+                <i class="fa-solid fa-clipboard-list w-5 text-center text-cyan-400"></i>
                 <span>Laporan Stok</span>
             </a>
 
             <a href="{{ route('admin.laporan.activity-log') }}"
                class="sidebar-link {{ request()->routeIs('admin.laporan.activity-log') ? 'active' : '' }}">
-                <i class="fa-solid fa-shield-halved w-5 text-center"></i>
+                <i class="fa-solid fa-shield-halved w-5 text-center text-slate-400"></i>
                 <span>Log Aktivitas</span>
             </a>
         </div>
@@ -150,11 +150,16 @@
             <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider px-3 mb-1.5">Sistem</p>
 
             <a href="{{ route('admin.pengaturan.index') }}"
-               class="sidebar-link {{ request()->routeIs('admin.pengaturan.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-gear w-5 text-center"></i>
+               class="sidebar-link {{ request()->routeIs('admin.pengaturan.index') ? 'active' : '' }}">
+                <i class="fa-solid fa-gear w-5 text-center text-slate-400"></i>
                 <span>Pengaturan</span>
             </a>
 
+            <a href="{{ route('admin.pengaturan.guide') }}"
+               class="sidebar-link {{ request()->routeIs('admin.pengaturan.guide') ? 'active' : '' }}">
+                <i class="fa-solid fa-book-open w-5 text-center text-amber-400"></i>
+                <span>Petunjuk Penggunaan</span>
+            </a>
 
         </div>
 

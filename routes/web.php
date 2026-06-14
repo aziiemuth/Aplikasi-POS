@@ -108,6 +108,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // === FASE 8: Pengaturan Sistem & Pemeliharaan ===
     // =========================================================
     Route::get('/pengaturan', [\App\Http\Controllers\Admin\PengaturanController::class, 'index'])->name('pengaturan.index');
+    Route::get('/pengaturan/panduan', [\App\Http\Controllers\Admin\PengaturanController::class, 'guide'])->name('pengaturan.guide');
     Route::post('/pengaturan/identitas', [\App\Http\Controllers\Admin\PengaturanController::class, 'updateIdentitas'])->name('pengaturan.identitas');
     Route::delete('/pengaturan/logo', [\App\Http\Controllers\Admin\PengaturanController::class, 'deleteLogo'])->name('pengaturan.logo.delete');
     Route::get('/pengaturan/backup', [\App\Http\Controllers\Admin\PengaturanController::class, 'backup'])->name('pengaturan.backup');
