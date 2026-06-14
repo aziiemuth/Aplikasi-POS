@@ -177,7 +177,7 @@ class PengaturanController extends Controller
             // Disable foreign key checks
             DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-            // List of tables to clear
+            // List of tables to clear (Pembersihan total kecuali users & sessions)
             $tables = [
                 'order_items',
                 'orders',
@@ -187,14 +187,18 @@ class PengaturanController extends Controller
                 'suppliers',
                 'categories',
                 'activity_logs',
-                'store_settings'
+                'store_settings',
+                'cache',
+                'cache_locks',
+                'jobs',
+                'job_batches',
+                'failed_jobs',
+                'password_reset_tokens'
             ];
 
-            // Hapus berkas logo jika ada
-            $logo = StoreSetting::get('logo');
-            if ($logo && Storage::disk('public')->exists($logo)) {
-                Storage::disk('public')->delete($logo);
-            }
+            // Bersihkan semua file unggahan (logo toko & foto produk) dari storage
+            Storage::disk('public')->deleteDirectory('logo');
+            Storage::disk('public')->deleteDirectory('products');
 
             // Truncate tables
             foreach ($tables as $table) {
