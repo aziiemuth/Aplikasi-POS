@@ -39,9 +39,11 @@ class ActivityLogger
             return $response;
         }
 
-        // Catat setiap metode yang mengubah data
+        // Catat setiap metode yang mengubah data jika belum dicatat secara manual oleh controller
         if (in_array($request->method(), ['POST', 'PUT', 'PATCH', 'DELETE'])) {
-            $this->logActivity($request, $response);
+            if (! ActivityLog::$hasLoggedManual) {
+                $this->logActivity($request, $response);
+            }
         }
 
         return $response;
@@ -53,10 +55,128 @@ class ActivityLogger
             $routeName  = $request->route()?->getName() ?? 'unknown';
             $method     = $request->method();
             $url        = $request->path();
+            $statusCode = $response->getStatusCode();
+
+            // Mapping route/url ke bahasa sehari-hari yang ramah
+            $routeMapping = [
+                'login.post' => [
+                    'aksi' => 'Login Berhasil',
+                    'deskripsi' => 'Pengguna berhasil masuk ke dalam sistem.',
+                ],
+                'logout' => [
+                    'aksi' => 'Logout',
+                    'deskripsi' => 'Pengguna keluar dari sistem.',
+                ],
+                'admin.users.store' => [
+                    'aksi' => 'Tambah User',
+                    'deskripsi' => 'Menambahkan akun pengguna baru.',
+                ],
+                'admin.users.update' => [
+                    'aksi' => 'Edit User',
+                    'deskripsi' => 'Mengubah informasi atau status akun pengguna.',
+                ],
+                'admin.users.destroy' => [
+                    'aksi' => 'Hapus User',
+                    'deskripsi' => 'Menghapus akun pengguna dari sistem.',
+                ],
+                'admin.users.restore' => [
+                    'aksi' => 'Restore User',
+                    'deskripsi' => 'Memulihkan kembali akun pengguna yang dihapus.',
+                ],
+                'admin.users.toggle-status' => [
+                    'aksi' => 'Ubah Status User',
+                    'deskripsi' => 'Mengubah status aktif/nonaktif akun pengguna.',
+                ],
+                'admin.categories.store' => [
+                    'aksi' => 'Tambah Kategori',
+                    'deskripsi' => 'Menambahkan kategori produk baru.',
+                ],
+                'admin.categories.update' => [
+                    'aksi' => 'Edit Kategori',
+                    'deskripsi' => 'Mengubah nama atau informasi kategori produk.',
+                ],
+                'admin.categories.destroy' => [
+                    'aksi' => 'Hapus Kategori',
+                    'deskripsi' => 'Menghapus kategori produk dari sistem.',
+                ],
+                'admin.categories.toggle' => [
+                    'aksi' => 'Ubah Status Kategori',
+                    'deskripsi' => 'Mengubah status aktif/nonaktif kategori produk.',
+                ],
+                'admin.suppliers.store' => [
+                    'aksi' => 'Tambah Supplier',
+                    'deskripsi' => 'Menambahkan supplier baru.',
+                ],
+                'admin.suppliers.update' => [
+                    'aksi' => 'Edit Supplier',
+                    'deskripsi' => 'Mengubah informasi supplier.',
+                ],
+                'admin.suppliers.destroy' => [
+                    'aksi' => 'Hapus Supplier',
+                    'deskripsi' => 'Menghapus supplier dari sistem.',
+                ],
+                'admin.suppliers.toggle' => [
+                    'aksi' => 'Ubah Status Supplier',
+                    'deskripsi' => 'Mengubah status aktif/nonaktif supplier.',
+                ],
+                'admin.products.store' => [
+                    'aksi' => 'Tambah Produk',
+                    'deskripsi' => 'Menambahkan produk baru ke katalog.',
+                ],
+                'admin.products.update' => [
+                    'aksi' => 'Edit Produk',
+                    'deskripsi' => 'Mengubah informasi detail produk.',
+                ],
+                'admin.products.destroy' => [
+                    'aksi' => 'Hapus Produk',
+                    'deskripsi' => 'Menghapus produk dari katalog.',
+                ],
+                'admin.products.destroy-foto' => [
+                    'aksi' => 'Hapus Foto Produk',
+                    'deskripsi' => 'Menghapus gambar/foto dari produk.',
+                ],
+                'admin.products.restore' => [
+                    'aksi' => 'Restore Produk',
+                    'deskripsi' => 'Memulihkan kembali produk yang telah dihapus.',
+                ],
+                'admin.stock.masuk.store' => [
+                    'aksi' => 'Stok Masuk',
+                    'deskripsi' => 'Mencatat penambahan stok barang masuk.',
+                ],
+                'admin.stock.keluar.store' => [
+                    'aksi' => 'Stok Keluar Manual',
+                    'deskripsi' => 'Mencatat pengurangan stok barang keluar secara manual.',
+                ],
+            ];
+
+            if (isset($routeMapping[$routeName])) {
+                $aksi = $routeMapping[$routeName]['aksi'];
+                $deskripsi = $routeMapping[$routeName]['deskripsi'];
+                
+                if ($statusCode >= 400) {
+                    $deskripsi .= " (Gagal dengan status: {$statusCode})";
+                }
+            } else {
+                // Fallback dinamis jika route tidak ada di mapping, tapi tetap ramah
+                $friendlyMethod = match ($method) {
+                    'POST' => 'Menambah data',
+                    'PUT', 'PATCH' => 'Mengubah data',
+                    'DELETE' => 'Menghapus data',
+                    default => 'Aktivitas sistem',
+                };
+                
+                // Terjemahkan path URL menjadi lebih bersih
+                $cleanPath = str_replace('admin/', '', $url);
+                $cleanPath = preg_replace('/\d+/', '', $cleanPath); // hilangkan angka ID
+                $cleanPath = trim(str_replace('/', ' ', $cleanPath));
+                
+                $aksi = ucwords($friendlyMethod . ' ' . ($cleanPath ?: 'Sistem'));
+                $deskripsi = "Memproses permintaan {$method} pada halaman {$url} (Status: {$statusCode})";
+            }
 
             ActivityLog::log(
-                aksi: "{$method} {$url}",
-                deskripsi: "Route: {$routeName} | Status: {$response->getStatusCode()}",
+                aksi: $aksi,
+                deskripsi: $deskripsi,
             );
         } catch (\Throwable $e) {
             // Jangan sampai error logging menghentikan request utama

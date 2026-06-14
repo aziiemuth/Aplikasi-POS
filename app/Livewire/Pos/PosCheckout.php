@@ -131,7 +131,7 @@ class PosCheckout extends Component
 
         // Fase 4.3: LARANGAN STOK MINUS
         if (!$product || $product->stok_saat_ini <= 0) {
-            $this->dispatch('swal', title: 'Stok Kosong! 🚫', text: 'Barang ini tidak bisa ditambahkan karena stoknya habis.', icon: 'error');
+            $this->dispatch('swal', title: 'Stok Kosong!', text: 'Barang ini tidak bisa ditambahkan karena stoknya habis.', icon: 'error');
             return;
         }
 
@@ -261,13 +261,13 @@ class PosCheckout extends Component
                 Cart::where('user_id', auth()->id())->delete();
             });
 
-            ActivityLog::log('Hold Bill', "Kasir menahan transaksi (Open Bill) untuk customer: " . ($this->namaCustomer ?: 'Umum'));
+            ActivityLog::log('Tahan Transaksi', "Kasir menahan transaksi (Open Bill) untuk customer: " . ($this->namaCustomer ?: 'Umum'));
             $this->resetCheckoutForm();
             $this->loadOpenBills();
             $this->showOpenBills = true;
             unset($this->carts);
 
-            $this->dispatch('swal', title: 'Bill Di-hold! ⏸', text: 'Transaksi disimpan. Kasir bisa melayani pelanggan berikutnya.', icon: 'info');
+            $this->dispatch('swal', title: 'Bill Di-hold!', text: 'Transaksi disimpan. Kasir bisa melayani pelanggan berikutnya.', icon: 'info');
 
         } catch (Exception $e) {
             $this->dispatch('swal', title: 'Gagal Hold!', text: $e->getMessage(), icon: 'error');
@@ -314,6 +314,9 @@ class PosCheckout extends Component
             }
         }
 
+        // Catat ke activity log
+        ActivityLog::log('Lanjutkan Transaksi', "Kasir melanjutkan transaksi tertunda #{$order->nomor_order} untuk customer: {$order->nama_customer}");
+
         // Hapus order open bill beserta items
         $order->items()->delete();
         $order->delete();
@@ -322,7 +325,7 @@ class PosCheckout extends Component
         $this->showOpenBills = false;
         unset($this->carts);
 
-        $this->dispatch('swal', title: 'Bill Dilanjutkan! ▶', text: 'Item sudah kembali ke keranjang.', icon: 'success');
+        $this->dispatch('swal', title: 'Bill Dilanjutkan!', text: 'Item sudah kembali ke keranjang.', icon: 'success');
     }
 
     /**
@@ -332,6 +335,9 @@ class PosCheckout extends Component
     {
         $order = Order::find($orderId);
         if (!$order || $order->user_id !== auth()->id()) return;
+
+        // Catat ke activity log
+        ActivityLog::log('Batalkan Transaksi', "Kasir membatalkan transaksi tertunda #{$order->nomor_order} untuk customer: {$order->nama_customer}");
 
         $order->items()->delete();
         $order->delete();
@@ -392,7 +398,7 @@ class PosCheckout extends Component
 
             $kembalian = number_format((float) $order->kembalian, 0, ',', '.');
             $this->dispatch('swal',
-                title: 'Transaksi Berhasil! 🎉',
+                title: 'Transaksi Berhasil!',
                 text: "Order #{$order->nomor_order} | Kembalian: Rp {$kembalian}",
                 icon: 'success'
             );

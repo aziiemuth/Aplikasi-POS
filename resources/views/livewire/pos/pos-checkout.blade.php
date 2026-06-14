@@ -169,7 +169,7 @@
         <button @click="showCart = true" class="lg:hidden fixed bottom-6 right-4 z-40 bg-blue-600 text-white p-2.5 pr-4 rounded-full shadow-2xl shadow-blue-500/40 flex items-center gap-3 transition-transform animate-fade-in hover:scale-105 active:scale-95 border-2 border-white">
             <div class="relative bg-white/20 p-2 rounded-full w-10 h-10 flex items-center justify-center">
                 <i class="fa-solid fa-basket-shopping text-lg"></i>
-                <span class="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border border-blue-600">{{ $carts->count() }}</span>
+                <span class="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border border-blue-600">{{ $carts->sum('jumlah') }}</span>
             </div>
             <div class="flex flex-col items-start leading-tight">
                 <span class="text-[10px] font-medium text-blue-100">Checkout</span>
@@ -195,7 +195,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <span class="bg-blue-600 text-xs px-2 py-1 rounded-md font-bold">{{ $carts->count() }} item</span>
+                    <span class="bg-blue-600 text-xs px-2 py-1 rounded-md font-bold">{{ $carts->sum('jumlah') }} item</span>
                     <button wire:click="clearCart" wire:confirm="Kosongkan seluruh keranjang?" class="text-slate-400 hover:text-rose-400 transition-colors" title="Kosongkan keranjang">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
@@ -371,10 +371,6 @@
                             <label class="block text-xs font-semibold text-slate-600 mb-1.5">Metode Bayar</label>
                             <select wire:model="metodePembayaran" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-100 outline-none">
                                 <option value="Tunai">💵 Tunai</option>
-                                <option value="Debit BCA">💳 Debit BCA</option>
-                                <option value="OVO">📱 OVO</option>
-                                <option value="DANA">📱 DANA</option>
-                                <option value="GoPay">📱 GoPay</option>
                                 <option value="QRIS">📲 QRIS</option>
                                 <option value="Transfer">🏦 Transfer Bank</option>
                             </select>
@@ -458,7 +454,7 @@
     </div>
 
     {{-- MODAL CAMERA SCANNER --}}
-    <div id="camera-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm px-4">
+    <div id="camera-modal" wire:ignore class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm px-4">
         <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden animate-fade-in flex flex-col">
             <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
                 <h3 class="font-bold text-slate-800 flex items-center gap-2">
@@ -544,8 +540,8 @@
                 showConfirmButton: false,
                 timer: data.icon === 'error' ? 5000 : 3000,
                 timerProgressBar: true,
-                width: '380px',
-                customClass: { popup: 'rounded-2xl shadow-xl border border-slate-100 text-sm' }
+                width: '300px',
+                customClass: { popup: 'rounded-xl shadow-xl border border-slate-100 text-sm' }
             });
         });
 
@@ -594,7 +590,7 @@
             } else {
                 window.scanBuffer += e.key;
                 clearTimeout(window.scanTimer);
-                window.scanTimer = setTimeout(() => { window.scanBuffer = ''; }, 500);
+                window.scanTimer = setTimeout(() => { window.scanBuffer = ''; }, 100);
             }
         });
         window.barcodeListenerRegistered = true;
@@ -700,29 +696,15 @@
             window.handleBarcodeScan(decodedText);
         }
         
-        // Stop scanning immediately on success to prevent duplicates
-        if (window.html5QrCode) {
-            const tempScanner = window.html5QrCode;
-            window.html5QrCode = null;
-            if (tempScanner.isScanning) {
-                tempScanner.stop().then(() => {
-                    console.log("Scanner stopped on success.");
-                }).catch(error => {
-                    console.error("Failed to stop scanner on success: ", error);
-                });
-            }
-        }
-        
-        // Tutup camera scanner secara otomatis setelah 1 detik
+        // Biarkan kamera tetap terbuka (jangan di-stop),
+        // tapi beri cooldown 3 detik sebelum bisa scan ulang
         setTimeout(() => {
-            document.getElementById('camera-modal').classList.add('hidden');
-            document.getElementById('camera-modal').classList.remove('flex');
             window.scanDelay = false;
             if (feedback) {
                 feedback.classList.remove('flex');
                 feedback.classList.add('hidden');
             }
-        }, 1000);
+        }, 3000);
     }
 
     function onScanFailure(error) {

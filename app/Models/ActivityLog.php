@@ -21,6 +21,11 @@ class ActivityLog extends Model
     ];
 
     /**
+     * Flag untuk menandai apakah ada manual log yang ditulis dalam request ini.
+     */
+    public static bool $hasLoggedManual = false;
+
+    /**
      * Relasi: Log dilakukan oleh satu user (nullable untuk log sistem).
      */
     public function user(): BelongsTo
@@ -48,5 +53,8 @@ class ActivityLog extends Model
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
+
+        // Tandai bahwa manual log telah ditulis pada request ini
+        self::$hasLoggedManual = true;
     }
 }

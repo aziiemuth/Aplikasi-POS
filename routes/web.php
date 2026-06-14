@@ -96,9 +96,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/stock/produk/{product}', [StockMutationController::class, 'perProduk'])->name('stock.per-produk');
 
     // =========================================================
-    // === FASE 5: Diagnostik Alat ===
+    // === FASE 7: Laporan Bisnis ===
     // =========================================================
-    // Dihapus dari Admin
+    Route::get('/laporan/penjualan', [\App\Http\Controllers\Admin\LaporanController::class, 'penjualan'])->name('laporan.penjualan');
+    Route::get('/laporan/penjualan/export', [\App\Http\Controllers\Admin\LaporanController::class, 'exportPenjualan'])->name('laporan.penjualan.export');
+    Route::get('/laporan/stok', [\App\Http\Controllers\Admin\LaporanController::class, 'stok'])->name('laporan.stok');
+    Route::get('/laporan/stok/export', [\App\Http\Controllers\Admin\LaporanController::class, 'exportStok'])->name('laporan.stok.export');
+    Route::get('/laporan/activity-log', [\App\Http\Controllers\Admin\LaporanController::class, 'activityLog'])->name('laporan.activity-log');
 
 });
 

@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
+use App\Models\ActivityLog;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use App\Events\StockUpdated;
@@ -104,6 +105,13 @@ class PosTransactionService
 
             // 4. Bersihkan keranjang kasir ini
             Cart::where('user_id', $user->id)->delete();
+
+            // Catat ke activity log
+            ActivityLog::log(
+                'Checkout Penjualan',
+                "Kasir [{$user->username}] berhasil menyelesaikan transaksi penjualan #{$order->nomor_order} senilai Rp " . number_format($order->total_pembayaran, 0, ',', '.') . " (Metode: {$order->metode_pembayaran}).",
+                $order
+            );
 
             return $order;
         });

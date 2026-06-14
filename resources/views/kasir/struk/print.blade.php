@@ -67,11 +67,15 @@
             border-collapse: collapse;
             font-size: 11px;
             margin-bottom: 5px;
+            table-layout: fixed;
+            word-wrap: break-word;
         }
         
         .items td {
             vertical-align: top;
             padding: 2px 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .item-name {

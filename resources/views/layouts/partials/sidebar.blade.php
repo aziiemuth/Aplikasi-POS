@@ -121,14 +121,26 @@
             </a>
         </div>
 
-        {{-- Placeholder Laporan (Fase 7) --}}
+        {{-- === FASE 7: Laporan Bisnis === --}}
         <div class="mb-3 pt-2 border-t border-slate-700/60 flex flex-col gap-1">
             <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider px-3 mb-1.5">Laporan</p>
 
-            <a href="#" class="sidebar-link opacity-40 cursor-not-allowed" title="Tersedia di Fase 7">
+            <a href="{{ route('admin.laporan.penjualan') }}"
+               class="sidebar-link {{ request()->routeIs('admin.laporan.penjualan*') ? 'active' : '' }}">
                 <i class="fa-solid fa-chart-line w-5 text-center"></i>
                 <span>Laporan Penjualan</span>
-                <span class="ml-auto text-xs bg-slate-600 text-slate-400 px-1.5 py-0.5 rounded">Soon</span>
+            </a>
+
+            <a href="{{ route('admin.laporan.stok') }}"
+               class="sidebar-link {{ request()->routeIs('admin.laporan.stok*') ? 'active' : '' }}">
+                <i class="fa-solid fa-clipboard-list w-5 text-center"></i>
+                <span>Laporan Stok</span>
+            </a>
+
+            <a href="{{ route('admin.laporan.activity-log') }}"
+               class="sidebar-link {{ request()->routeIs('admin.laporan.activity-log') ? 'active' : '' }}">
+                <i class="fa-solid fa-shield-halved w-5 text-center"></i>
+                <span>Log Aktivitas</span>
             </a>
         </div>
 
