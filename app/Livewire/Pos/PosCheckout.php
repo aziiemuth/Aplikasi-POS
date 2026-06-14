@@ -7,6 +7,7 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\StoreSetting;
 use App\Services\CacheService;
 use App\Services\PosTransactionService;
 use Exception;
@@ -237,7 +238,8 @@ class PosCheckout extends Component
         try {
             DB::transaction(function () {
                 $subtotal        = $this->calculateSubtotal();
-                $totalPembayaran = $subtotal - ($this->diskonGlobal ?: 0) + ($this->pajakPpn ?: 0);
+                $this->pajakPpn  = $this->calculatePajakPpn($subtotal);
+                $totalPembayaran = $subtotal - ($this->diskonGlobal ?: 0) + $this->pajakPpn;
 
                 $order = Order::create([
                     'user_id'              => auth()->id(),
@@ -376,7 +378,8 @@ class PosCheckout extends Component
         }
 
         $subtotal = $this->calculateSubtotal();
-        $this->jumlahBayar = max(0, $subtotal - ($this->diskonGlobal ?: 0) + ($this->pajakPpn ?: 0));
+        $this->pajakPpn = $this->calculatePajakPpn($subtotal);
+        $this->jumlahBayar = max(0, $subtotal - ($this->diskonGlobal ?: 0) + $this->pajakPpn);
         $this->showPaymentModal = true;
     }
 
@@ -385,11 +388,24 @@ class PosCheckout extends Component
         return (float) $this->carts->sum(fn ($c) => ($c->product->harga_jual - $c->diskon_item) * $c->jumlah);
     }
 
+    private function calculatePajakPpn(float $subtotal): float
+    {
+        $persenPajak = StoreSetting::get('pajak_default', 0);
+        if ($persenPajak > 0) {
+            $dpp = max(0, $subtotal - ($this->diskonGlobal ?: 0));
+            return (float) ($dpp * ($persenPajak / 100));
+        }
+        return 0;
+    }
+
     public function processCheckout()
     {
         $this->validate([
             'jumlahBayar' => 'required|numeric|min:0',
         ]);
+
+        $subtotal = $this->calculateSubtotal();
+        $this->pajakPpn = $this->calculatePajakPpn($subtotal);
 
         try {
             $order = PosTransactionService::checkout(
@@ -468,11 +484,14 @@ class PosCheckout extends Component
 
     public function render()
     {
+        $subtotal = $this->calculateSubtotal();
+        $this->pajakPpn = $this->calculatePajakPpn($subtotal);
+
         return view('livewire.pos.pos-checkout', [
             'products'   => $this->products,
             'categories' => $this->categories,
             'carts'      => $this->carts,
-            'subtotal'   => $this->calculateSubtotal(),
+            'subtotal'   => $subtotal,
         ])->layout('layouts.app');
     }
 }

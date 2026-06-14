@@ -363,6 +363,17 @@
                     </div>
                 </div>
 
+                {{-- Pajak/PPN --}}
+                @if($pajakPpn > 0)
+                    <div class="flex justify-between items-center text-sm pt-1">
+                        <span class="text-slate-500 flex items-center gap-1">
+                            <i class="fa-solid fa-percent text-xs"></i> Pajak/PPN
+                        </span>
+                        <span class="font-semibold text-slate-800">+ Rp
+                            {{ number_format($pajakPpn, 0, ',', '.') }}</span>
+                    </div>
+                @endif
+
                 {{-- Total Akhir --}}
                 <div class="pt-2 border-t border-slate-100 flex justify-between items-end gap-2">
                     <span class="text-slate-500 font-semibold mb-0.5 shrink-0">Total Akhir</span>
@@ -764,8 +775,10 @@
             }
 
             function onScanSuccess(decodedText, decodedResult) {
-                if (window.scanDelay) return; // Mencegah scan berulang
+                // Mencegah scan berulang terlalu cepat (debounce 3 detik)
+                if (window.scanDelay) return;
                 window.scanDelay = true;
+                setTimeout(() => { window.scanDelay = false; }, 3000); 
 
                 // UI Feedback
                 const feedback = document.getElementById('scan-feedback');
