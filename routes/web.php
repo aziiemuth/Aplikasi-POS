@@ -128,10 +128,10 @@ Route::middleware(['auth', 'role:kasir,admin'])->prefix('kasir')->name('kasir.')
 
     // Halaman POS (dikembangkan di Fase 4)
     Route::get('/pos', \App\Livewire\Pos\PosCheckout::class)->name('pos');
-    
+
     // Riwayat Transaksi Kasir
     Route::get('/riwayat', \App\Livewire\Kasir\RiwayatTransaksi::class)->name('riwayat');
-    
+
     // Fase 6: Halaman Struk 58mm Khusus Cetak
     Route::get('/pos/struk/{order}', [\App\Http\Controllers\Kasir\OrderController::class, 'struk'])->name('struk');
 
@@ -139,3 +139,9 @@ Route::middleware(['auth', 'role:kasir,admin'])->prefix('kasir')->name('kasir.')
     Route::get('/tools/diagnostik', [\App\Http\Controllers\Kasir\ToolsController::class, 'diagnostik'])->name('tools.diagnostik');
 
 });
+
+Route::get('/run-link', function () {
+    Artisan::call('storage:link');
+    return 'Storage link created successfully!';
+});
+
