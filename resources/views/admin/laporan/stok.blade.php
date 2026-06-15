@@ -53,8 +53,8 @@
                         class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-emerald-100 outline-none">
                 </div>
                 <div class="flex gap-2 sm:col-span-2">
-                    <button type="submit"
-                        class="hidden flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
+                    <button type="submit" style="display: none;"
+                        class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
                         <i class="fa-solid fa-magnifying-glass"></i> <span>Tampilkan</span>
                     </button>
                     <a href="{{ route('admin.laporan.stok.export', request()->query()) }}"

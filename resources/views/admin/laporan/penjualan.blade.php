@@ -61,8 +61,8 @@
 
                 {{-- Tombol aksi --}}
                 <div class="flex gap-2 sm:col-span-2">
-                    <button type="submit"
-                        class="hidden flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
+                    <button type="submit" style="display: none;"
+                        class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
                         <i class="fa-solid fa-magnifying-glass"></i>
                         <span>Tampilkan</span>
                     </button>

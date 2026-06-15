@@ -33,8 +33,8 @@
                         class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-violet-100 outline-none">
                 </div>
                 <div class="flex gap-2 items-end">
-                    <button type="submit"
-                        class="hidden flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
+                    <button type="submit" style="display: none;"
+                        class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
                         <i class="fa-solid fa-magnifying-glass"></i> <span>Filter</span>
                     </button>
                     <a href="{{ route('admin.laporan.activity-log') }}"
