@@ -9,7 +9,7 @@
 
     {{-- ===== FILTER PANEL ===== --}}
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5">
-        <form method="GET" action="{{ route('admin.laporan.stok') }}">
+        <form id="filter-form" method="GET" action="{{ route('admin.laporan.stok') }}">
 
             <div class="flex gap-2 mb-4 overflow-x-auto pb-1 -mx-1 px-1">
                 @foreach(['harian' => 'Harian', 'bulanan' => 'Bulanan', 'tahunan' => 'Tahunan', 'custom' => 'Custom'] as $val => $label)
@@ -54,7 +54,7 @@
                 </div>
                 <div class="flex gap-2 sm:col-span-2">
                     <button type="submit"
-                        class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
+                        class="hidden flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
                         <i class="fa-solid fa-magnifying-glass"></i> <span>Tampilkan</span>
                     </button>
                     <a href="{{ route('admin.laporan.stok.export', request()->query()) }}"
@@ -66,6 +66,7 @@
         </form>
     </div>
 
+    <div id="result-container" class="space-y-5 mt-5">
     {{-- ===== RINGKASAN ===== --}}
     <div class="grid grid-cols-2 gap-3 sm:gap-4">
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex items-center gap-3 sm:gap-4">
@@ -166,6 +167,7 @@
         </div>
         @endif
     </div>
+    </div>
 
 </div>
 @endsection
@@ -188,6 +190,89 @@ function setMode(mode) {
         btn.className = btn.className.replace('bg-emerald-600 text-white border-emerald-600 shadow-sm', 'bg-slate-50 text-slate-600 border-slate-200 hover:border-emerald-300');
     });
     event.currentTarget.className = event.currentTarget.className.replace('bg-slate-50 text-slate-600 border-slate-200 hover:border-emerald-300', 'bg-emerald-600 text-white border-emerald-600 shadow-sm');
-}
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let filterTimer;
+        const form = document.getElementById('filter-form');
+        const container = document.getElementById('result-container');
+
+        if(form && container) {
+            function fetchResults() {
+                const url = new URL(form.action);
+                const formData = new FormData(form);
+                for (const [key, value] of formData.entries()) {
+                    if (value) {
+                        url.searchParams.set(key, value);
+                    }
+                }
+
+                container.style.opacity = '0.5';
+                
+                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newContainer = doc.getElementById('result-container');
+                    
+                    if (newContainer) {
+                        container.innerHTML = newContainer.innerHTML;
+                    }
+                    container.style.opacity = '1';
+                    
+                    window.history.pushState({}, '', url);
+                });
+            }
+
+            form.querySelectorAll('input, select').forEach(el => {
+                el.addEventListener('input', () => {
+                    clearTimeout(filterTimer);
+                    filterTimer = setTimeout(fetchResults, 300);
+                });
+                
+                el.addEventListener('change', () => {
+                    if(el.type !== 'text' && el.type !== 'search') {
+                        clearTimeout(filterTimer);
+                        fetchResults();
+                    }
+                });
+            });
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                fetchResults();
+            });
+            
+            // Intercept custom mode buttons
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    setTimeout(fetchResults, 50); // small delay to let setMode update the hidden input
+                });
+            });
+            
+            container.addEventListener('click', function(e) {
+                const link = e.target.closest('a');
+                if (link && link.href && link.href.includes('page=')) {
+                    e.preventDefault();
+                    
+                    container.style.opacity = '0.5';
+                    fetch(link.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(res => res.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newContainer = doc.getElementById('result-container');
+                        if (newContainer) {
+                            container.innerHTML = newContainer.innerHTML;
+                        }
+                        container.style.opacity = '1';
+                        window.history.pushState({}, '', link.href);
+                        container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    });
+                }
+            });
+        }
+    });
 </script>
 @endpush

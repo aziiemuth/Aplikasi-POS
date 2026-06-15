@@ -9,7 +9,7 @@
 
     {{-- ===== FILTER ===== --}}
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5">
-        <form method="GET" action="{{ route('admin.laporan.activity-log') }}">
+        <form id="filter-form" method="GET" action="{{ route('admin.laporan.activity-log') }}">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 mb-1.5">Filter User</label>
@@ -34,7 +34,7 @@
                 </div>
                 <div class="flex gap-2 items-end">
                     <button type="submit"
-                        class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
+                        class="hidden flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
                         <i class="fa-solid fa-magnifying-glass"></i> <span>Filter</span>
                     </button>
                     <a href="{{ route('admin.laporan.activity-log') }}"
@@ -46,6 +46,7 @@
         </form>
     </div>
 
+    <div id="result-container">
     {{-- ===== TABEL LOG ===== --}}
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="px-4 sm:px-5 py-4 border-b border-slate-100 flex items-center justify-between gap-3">
@@ -182,6 +183,87 @@
         </div>
         @endif
     </div>
+    </div>
 
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let filterTimer;
+        const form = document.getElementById('filter-form');
+        const container = document.getElementById('result-container');
+
+        if(form && container) {
+            function fetchResults() {
+                const url = new URL(form.action);
+                const formData = new FormData(form);
+                for (const [key, value] of formData.entries()) {
+                    if (value) {
+                        url.searchParams.set(key, value);
+                    }
+                }
+
+                container.style.opacity = '0.5';
+                
+                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newContainer = doc.getElementById('result-container');
+                    
+                    if (newContainer) {
+                        container.innerHTML = newContainer.innerHTML;
+                    }
+                    container.style.opacity = '1';
+                    
+                    window.history.pushState({}, '', url);
+                });
+            }
+
+            form.querySelectorAll('input, select').forEach(el => {
+                el.addEventListener('input', () => {
+                    clearTimeout(filterTimer);
+                    filterTimer = setTimeout(fetchResults, 300);
+                });
+                
+                el.addEventListener('change', () => {
+                    if(el.type !== 'text' && el.type !== 'search') {
+                        clearTimeout(filterTimer);
+                        fetchResults();
+                    }
+                });
+            });
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                fetchResults();
+            });
+            
+            container.addEventListener('click', function(e) {
+                const link = e.target.closest('a');
+                if (link && link.href && link.href.includes('page=')) {
+                    e.preventDefault();
+                    
+                    container.style.opacity = '0.5';
+                    fetch(link.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(res => res.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newContainer = doc.getElementById('result-container');
+                        if (newContainer) {
+                            container.innerHTML = newContainer.innerHTML;
+                        }
+                        container.style.opacity = '1';
+                        window.history.pushState({}, '', link.href);
+                        container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    });
+                }
+            });
+        }
+    });
+</script>
+@endpush

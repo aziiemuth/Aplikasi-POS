@@ -10,7 +10,7 @@
     {{-- ===== HEADER BAR ===== --}}
     <div class="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
         {{-- Search & Filter --}}
-        <form action="{{ route('admin.users.index') }}" method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
+        <form id="filter-form" action="{{ route('admin.users.index') }}" method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
             <div class="relative flex-1">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="fa-solid fa-magnifying-glass text-slate-400 text-sm"></i>
@@ -25,7 +25,7 @@
                     <option value="admin"  {{ request('role') == 'admin'  ? 'selected' : '' }}>Admin</option>
                     <option value="kasir"  {{ request('role') == 'kasir'  ? 'selected' : '' }}>Kasir</option>
                 </select>
-                <button type="submit" class="bg-slate-700 text-white text-sm px-4 py-2.5 rounded-xl hover:bg-slate-800 transition-colors font-semibold">
+                <button type="submit" class="hidden bg-slate-700 text-white text-sm px-4 py-2.5 rounded-xl hover:bg-slate-800 transition-colors font-semibold">
                     Filter
                 </button>
                 @if(request()->hasAny(['search','role']))
@@ -45,7 +45,7 @@
     </div>
 
     {{-- ===== TABLE ===== --}}
-    <div class="bg-white rounded-2xl shadow-sm border border-surface-200 overflow-hidden">
+    <div id="result-container" class="bg-white rounded-2xl shadow-sm border border-surface-200 overflow-hidden">
         <div class="overflow-x-auto w-full">
             <table class="w-full text-sm min-w-[800px]">
             <thead class="bg-slate-50 border-b border-slate-100">
@@ -168,4 +168,84 @@
         @endif
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let filterTimer;
+        const form = document.getElementById('filter-form');
+        const container = document.getElementById('result-container');
+
+        if(form && container) {
+            function fetchResults() {
+                const url = new URL(form.action);
+                const formData = new FormData(form);
+                for (const [key, value] of formData.entries()) {
+                    if (value) {
+                        url.searchParams.set(key, value);
+                    }
+                }
+
+                container.style.opacity = '0.5';
+                
+                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newContainer = doc.getElementById('result-container');
+                    
+                    if (newContainer) {
+                        container.innerHTML = newContainer.innerHTML;
+                    }
+                    container.style.opacity = '1';
+                    
+                    window.history.pushState({}, '', url);
+                });
+            }
+
+            form.querySelectorAll('input, select').forEach(el => {
+                el.addEventListener('input', () => {
+                    clearTimeout(filterTimer);
+                    filterTimer = setTimeout(fetchResults, 300);
+                });
+                
+                el.addEventListener('change', () => {
+                    if(el.type !== 'text' && el.type !== 'search') {
+                        clearTimeout(filterTimer);
+                        fetchResults();
+                    }
+                });
+            });
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                fetchResults();
+            });
+            
+            container.addEventListener('click', function(e) {
+                const link = e.target.closest('a');
+                if (link && link.href && link.href.includes('page=')) {
+                    e.preventDefault();
+                    
+                    container.style.opacity = '0.5';
+                    fetch(link.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(res => res.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newContainer = doc.getElementById('result-container');
+                        if (newContainer) {
+                            container.innerHTML = newContainer.innerHTML;
+                        }
+                        container.style.opacity = '1';
+                        window.history.pushState({}, '', link.href);
+                        container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    });
+                }
+            });
+        }
+    });
+</script>
+@endpush
 @endsection

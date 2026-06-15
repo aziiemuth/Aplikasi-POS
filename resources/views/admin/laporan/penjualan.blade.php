@@ -62,7 +62,7 @@
                 {{-- Tombol aksi --}}
                 <div class="flex gap-2 sm:col-span-2">
                     <button type="submit"
-                        class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
+                        class="hidden flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
                         <i class="fa-solid fa-magnifying-glass"></i>
                         <span>Tampilkan</span>
                     </button>
@@ -76,6 +76,7 @@
         </form>
     </div>
 
+    <div id="result-container" class="space-y-5 mt-5">
     {{-- ===== RINGKASAN PERIODE ===== --}}
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex items-center gap-4">
@@ -189,6 +190,7 @@
         </div>
         @endif
     </div>
+    </div>
 
 </div>
 @endsection
@@ -213,6 +215,89 @@ function setMode(mode) {
     });
     event.currentTarget.className = event.currentTarget.className
         .replace('bg-slate-50 text-slate-600 border-slate-200 hover:border-blue-300', 'bg-blue-600 text-white border-blue-600 shadow-sm');
-}
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let filterTimer;
+        const form = document.getElementById('filter-form');
+        const container = document.getElementById('result-container');
+
+        if(form && container) {
+            function fetchResults() {
+                const url = new URL(form.action);
+                const formData = new FormData(form);
+                for (const [key, value] of formData.entries()) {
+                    if (value) {
+                        url.searchParams.set(key, value);
+                    }
+                }
+
+                container.style.opacity = '0.5';
+                
+                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newContainer = doc.getElementById('result-container');
+                    
+                    if (newContainer) {
+                        container.innerHTML = newContainer.innerHTML;
+                    }
+                    container.style.opacity = '1';
+                    
+                    window.history.pushState({}, '', url);
+                });
+            }
+
+            form.querySelectorAll('input, select').forEach(el => {
+                el.addEventListener('input', () => {
+                    clearTimeout(filterTimer);
+                    filterTimer = setTimeout(fetchResults, 300);
+                });
+                
+                el.addEventListener('change', () => {
+                    if(el.type !== 'text' && el.type !== 'search') {
+                        clearTimeout(filterTimer);
+                        fetchResults();
+                    }
+                });
+            });
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                fetchResults();
+            });
+            
+            // Intercept custom mode buttons
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    setTimeout(fetchResults, 50);
+                });
+            });
+            
+            container.addEventListener('click', function(e) {
+                const link = e.target.closest('a');
+                if (link && link.href && link.href.includes('page=')) {
+                    e.preventDefault();
+                    
+                    container.style.opacity = '0.5';
+                    fetch(link.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(res => res.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newContainer = doc.getElementById('result-container');
+                        if (newContainer) {
+                            container.innerHTML = newContainer.innerHTML;
+                        }
+                        container.style.opacity = '1';
+                        window.history.pushState({}, '', link.href);
+                        container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    });
+                }
+            });
+        }
+    });
 </script>
 @endpush

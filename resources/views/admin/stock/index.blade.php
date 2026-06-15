@@ -8,7 +8,7 @@
 
     {{-- Filter Bar --}}
     <div class="flex flex-wrap gap-3 items-center justify-between">
-        <form action="{{ route('admin.stock.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
+        <form id="filter-form" action="{{ route('admin.stock.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
             <select name="product_id" class="text-sm border border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:ring-2 focus:ring-blue-100 outline-none">
                 <option value="">Semua Produk</option>
                 @foreach($products as $p)
@@ -24,7 +24,7 @@
                 class="text-sm border border-slate-200 rounded-xl px-3 py-2.5 bg-white outline-none">
             <input type="date" name="date_to" value="{{ request('date_to') }}"
                 class="text-sm border border-slate-200 rounded-xl px-3 py-2.5 bg-white outline-none">
-            <button type="submit" class="bg-slate-700 text-white text-sm px-4 py-2.5 rounded-xl hover:bg-slate-800 transition-colors">Filter</button>
+            <button type="submit" class="hidden bg-slate-700 text-white text-sm px-4 py-2.5 rounded-xl hover:bg-slate-800 transition-colors">Filter</button>
             @if(request()->hasAny(['product_id','tipe','date_from','date_to']))
             <a href="{{ route('admin.stock.index') }}" class="text-slate-500 text-sm px-3 py-2.5 rounded-xl hover:bg-slate-100 transition-colors">Reset</a>
             @endif
@@ -42,7 +42,7 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-sm border border-surface-200 overflow-hidden">
+    <div id="result-container" class="bg-white rounded-2xl shadow-sm border border-surface-200 overflow-hidden">
         <div class="overflow-x-auto w-full">
             <table class="w-full text-sm min-w-[900px]">
             <thead class="bg-slate-50 border-b border-slate-100">
@@ -124,4 +124,84 @@
         @endif
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let filterTimer;
+        const form = document.getElementById('filter-form');
+        const container = document.getElementById('result-container');
+
+        if(form && container) {
+            function fetchResults() {
+                const url = new URL(form.action);
+                const formData = new FormData(form);
+                for (const [key, value] of formData.entries()) {
+                    if (value) {
+                        url.searchParams.set(key, value);
+                    }
+                }
+
+                container.style.opacity = '0.5';
+                
+                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newContainer = doc.getElementById('result-container');
+                    
+                    if (newContainer) {
+                        container.innerHTML = newContainer.innerHTML;
+                    }
+                    container.style.opacity = '1';
+                    
+                    window.history.pushState({}, '', url);
+                });
+            }
+
+            form.querySelectorAll('input, select').forEach(el => {
+                el.addEventListener('input', () => {
+                    clearTimeout(filterTimer);
+                    filterTimer = setTimeout(fetchResults, 300);
+                });
+                
+                el.addEventListener('change', () => {
+                    if(el.type !== 'text' && el.type !== 'search') {
+                        clearTimeout(filterTimer);
+                        fetchResults();
+                    }
+                });
+            });
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                fetchResults();
+            });
+            
+            container.addEventListener('click', function(e) {
+                const link = e.target.closest('a');
+                if (link && link.href && link.href.includes('page=')) {
+                    e.preventDefault();
+                    
+                    container.style.opacity = '0.5';
+                    fetch(link.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(res => res.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newContainer = doc.getElementById('result-container');
+                        if (newContainer) {
+                            container.innerHTML = newContainer.innerHTML;
+                        }
+                        container.style.opacity = '1';
+                        window.history.pushState({}, '', link.href);
+                        container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    });
+                }
+            });
+        }
+    });
+</script>
+@endpush
 @endsection
