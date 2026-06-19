@@ -31,7 +31,8 @@ class PosTransactionService
         $order = DB::transaction(function () use (
             $user, $namaCustomer, $metodePembayaran, $jumlahBayar, $diskonGlobal, $pajakPpn, $catatan, $status
         ) {
-            $carts = Cart::where('user_id', $user->id)->with('product')->get();
+            $colUserId = 'user_id';
+            $carts = Cart::where($colUserId, $user->id)->with('product')->get();
 
             if ($carts->isEmpty()) {
                 throw new Exception("Keranjang kosong, tidak bisa checkout.");
@@ -104,7 +105,7 @@ class PosTransactionService
             }
 
             // 4. Bersihkan keranjang kasir ini
-            Cart::where('user_id', $user->id)->delete();
+            Cart::where($colUserId, $user->id)->delete();
 
             // Catat ke activity log
             ActivityLog::log(

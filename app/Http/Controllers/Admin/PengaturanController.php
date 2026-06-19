@@ -28,7 +28,8 @@ class PengaturanController extends Controller
     public function index()
     {
         $settings = StoreSetting::all_settings();
-        $categories = Category::active()->orderBy('nama_kategori')->get();
+        $colNamaKategori = 'nama_kategori';
+        $categories = Category::active()->orderBy($colNamaKategori)->get();
         return view('admin.pengaturan.index', compact('settings', 'categories'));
     }
 
@@ -61,7 +62,16 @@ class PengaturanController extends Controller
             StoreSetting::set($key, $request->input($key, ''));
         }
 
-        // Upload logo
+        // Cek apakah logo ingin dihapus
+        if ($request->input('hapus_logo') == '1') {
+            $oldLogo = StoreSetting::get('logo');
+            if ($oldLogo && Storage::disk('public')->exists($oldLogo)) {
+                Storage::disk('public')->delete($oldLogo);
+            }
+            StoreSetting::set('logo', null);
+        }
+
+        // Upload logo baru (akan menimpa penghapusan di atas jika user ternyata hapus lalu pilih file)
         if ($request->hasFile('logo')) {
             $oldLogo = StoreSetting::get('logo');
             if ($oldLogo && Storage::disk('public')->exists($oldLogo)) {
@@ -75,20 +85,6 @@ class PengaturanController extends Controller
 
         return redirect()->route('admin.pengaturan.index')
             ->with('success', 'Pengaturan toko berhasil disimpan!');
-    }
-
-    /**
-     * Hapus logo toko.
-     */
-    public function deleteLogo()
-    {
-        $logo = StoreSetting::get('logo');
-        if ($logo && Storage::disk('public')->exists($logo)) {
-            Storage::disk('public')->delete($logo);
-        }
-        StoreSetting::set('logo', null);
-        return redirect()->route('admin.pengaturan.index')
-            ->with('success', 'Logo berhasil dihapus.');
     }
 
     // ============================================================

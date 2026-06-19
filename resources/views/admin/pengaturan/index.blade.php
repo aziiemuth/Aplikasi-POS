@@ -111,19 +111,22 @@
                         <span class="text-slate-400 font-normal">(PNG/JPG, maks 2MB — tampil di header struk)</span>
                     </label>
 
+                    {{-- Hidden input to track deletion --}}
+                    <input type="hidden" name="hapus_logo" id="hapus_logo" value="0">
+
                     <div class="flex flex-col sm:flex-row items-start gap-4">
                         {{-- Preview logo saat ini --}}
                         @if(!empty($settings['logo']))
-                            <div class="flex flex-col items-center gap-2 shrink-0">
+                            <div id="current-logo-container" class="flex flex-col items-center gap-2 shrink-0">
                                 <div class="w-20 h-20 rounded-xl border-2 border-blue-200 bg-slate-50 flex items-center justify-center overflow-hidden">
                                     <img src="{{ Storage::url($settings['logo']) }}" alt="Logo Toko" class="max-w-full max-h-full object-contain">
                                 </div>
-                                <button type="button" onclick="if(confirm('Hapus logo?')) document.getElementById('form-delete-logo').submit();" class="text-xs text-rose-500 hover:underline flex items-center gap-1">
+                                <button type="button" onclick="pendingDeleteLogo()" class="text-xs text-rose-500 hover:underline flex items-center gap-1">
                                     <i class="fa-solid fa-trash text-xs"></i> Hapus Logo
                                 </button>
                             </div>
                         @else
-                            <div class="w-20 h-20 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center shrink-0">
+                            <div id="no-logo-placeholder" class="w-20 h-20 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center shrink-0">
                                 <i class="fa-solid fa-image text-slate-300 text-2xl"></i>
                             </div>
                         @endif
@@ -156,10 +159,7 @@
             </div>
         </form>
 
-        {{-- Form terpisah untuk hapus logo agar tidak nested form --}}
-        <form id="form-delete-logo" action="{{ route('admin.pengaturan.logo.delete') }}" method="POST" class="hidden">
-            @csrf @method('DELETE')
-        </form>
+        {{-- Separate delete form removed to allow pending deletion via main form --}}
     </div>
 
     {{-- ========================================================
@@ -391,6 +391,36 @@ function previewLogo(input) {
     if (input.files && input.files[0]) {
         preview.classList.remove('hidden');
         filename.textContent = input.files[0].name;
+        // Jika pilih file baru, batalkan status hapus logo
+        document.getElementById('hapus_logo').value = '0';
+    }
+}
+
+function pendingDeleteLogo() {
+    // Sembunyikan preview lama
+    const container = document.getElementById('current-logo-container');
+    if (container) container.classList.add('hidden');
+    
+    // Set input hapus_logo menjadi 1
+    document.getElementById('hapus_logo').value = '1';
+    
+    // Kosongkan file input jika ada yang terlanjur dipilih
+    document.getElementById('logo').value = '';
+    document.getElementById('logo-preview-new').classList.add('hidden');
+    
+    // Tampilkan placeholder jika perlu
+    let placeholder = document.getElementById('no-logo-placeholder');
+    if (!placeholder && container) {
+        // Buat placeholder sederhana agar tampilan tidak kosong
+        const div = document.createElement('div');
+        div.id = 'no-logo-placeholder';
+        div.className = 'w-20 h-20 rounded-xl border-2 border-dashed border-rose-200 bg-rose-50 flex flex-col items-center justify-center shrink-0 text-rose-400';
+        div.innerHTML = '<i class="fa-solid fa-trash mb-1"></i><span class="text-[10px] font-semibold text-center leading-none">Akan<br>Dihapus</span>';
+        container.parentNode.insertBefore(div, container.nextSibling);
+    } else if (placeholder) {
+        placeholder.classList.remove('hidden');
+        placeholder.className = 'w-20 h-20 rounded-xl border-2 border-dashed border-rose-200 bg-rose-50 flex flex-col items-center justify-center shrink-0 text-rose-400';
+        placeholder.innerHTML = '<i class="fa-solid fa-trash mb-1"></i><span class="text-[10px] font-semibold text-center leading-none">Akan<br>Dihapus</span>';
     }
 }
 

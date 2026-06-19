@@ -39,11 +39,13 @@ class LaporanController extends Controller
         $totalTransaksi  = $summaryQuery->count();
 
         // Laba kotor: hitung dari order_items
+        $colCreatedAt = 'created_at';
         $labaKotor = Order::lunas()
-            ->whereBetween('created_at', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()])
+            ->whereBetween($colCreatedAt, [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()])
             ->get()->sum(fn($order) => $order->laba_kotor);
 
-        $kasirList = User::kasir()->orderBy('name')->get();
+        $colName = 'name';
+        $kasirList = User::kasir()->orderBy($colName)->get();
 
         return view('admin.laporan.penjualan', compact(
             'orders', 'totalOmzet', 'totalTransaksi', 'labaKotor',
@@ -106,18 +108,25 @@ class LaporanController extends Controller
     {
         $query = ActivityLog::with('user')->latest();
 
+        $colUserId = 'user_id';
         if ($request->filled('user_id')) {
-            $query->where('user_id', $request->input('user_id'));
+            $query->where($colUserId, $request->input('user_id'));
         }
+
+        $colAksi = 'aksi';
         if ($request->filled('aksi')) {
-            $query->where('aksi', 'like', '%' . $request->input('aksi') . '%');
+            $query->where($colAksi, 'like', '%' . $request->input('aksi') . '%');
         }
+
+        $colCreatedAt = 'created_at';
         if ($request->filled('tanggal')) {
-            $query->whereDate('created_at', $request->input('tanggal'));
+            $query->whereDate($colCreatedAt, $request->input('tanggal'));
         }
 
         $logs     = $query->paginate(25)->withQueryString();
-        $userList = User::query()->orderBy('name')->get();
+        
+        $colName = 'name';
+        $userList = User::query()->orderBy($colName)->get();
 
         return view('admin.laporan.activity-log', compact('logs', 'userList'));
     }

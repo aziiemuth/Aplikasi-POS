@@ -25,15 +25,21 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
+        $colNamaProduk = 'nama_produk';
+        $colSku = 'sku';
+        $colCategoryId = 'category_id';
+        $colStokSaatIni = 'stok_saat_ini';
+        $colNamaKategori = 'nama_kategori';
+
         $products = Product::withTrashed()
             ->with('category')
-            ->when($request->search, fn($q) => $q->where(function ($q) use ($request) {
-                $q->where('nama_produk', 'like', "%{$request->search}%")
-                  ->orWhere('sku', 'like', "%{$request->search}%");
+            ->when($request->input('search'), fn($q) => $q->where(function ($q) use ($request, $colNamaProduk, $colSku) {
+                $q->where($colNamaProduk, 'like', "%{$request->input('search')}%")
+                  ->orWhere($colSku, 'like', "%{$request->input('search')}%");
             }))
-            ->when($request->category, fn($q) => $q->where('category_id', $request->category))
-            ->when($request->stok === 'tipis', fn($q) => $q->active()->whereColumn('stok_saat_ini', '<=', 'stok_minimum'))
-            ->when($request->stok === 'kosong', fn($q) => $q->active()->where('stok_saat_ini', 0))
+            ->when($request->input('category'), fn($q) => $q->where($colCategoryId, $request->input('category')))
+            ->when($request->input('stok') === 'tipis', fn($q) => $q->active()->whereColumn($colStokSaatIni, '<=', 'stok_minimum'))
+            ->when($request->input('stok') === 'kosong', fn($q) => $q->active()->where($colStokSaatIni, 0))
             ->orderByRaw('deleted_at IS NOT NULL, nama_produk ASC')
             ->paginate(15)
             ->withQueryString();
@@ -42,7 +48,7 @@ class ProductController extends Controller
             return view('admin.products._table', compact('products'))->render();
         }
 
-        $categories = Category::active()->orderBy('nama_kategori')->get();
+        $categories = Category::active()->orderBy($colNamaKategori)->get();
 
         return view('admin.products.index', compact('products', 'categories'));
     }
@@ -52,7 +58,8 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $categories = Category::active()->orderBy('nama_kategori')->get();
+        $colNamaKategori = 'nama_kategori';
+        $categories = Category::active()->orderBy($colNamaKategori)->get();
         $satuan = $this->getSatuanList();
 
         return view('admin.products.create', compact('categories', 'satuan'));
@@ -132,7 +139,8 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        $categories = Category::active()->orderBy('nama_kategori')->get();
+        $colNamaKategori = 'nama_kategori';
+        $categories = Category::active()->orderBy($colNamaKategori)->get();
         $satuan = $this->getSatuanList();
 
         return view('admin.products.edit', compact('product', 'categories', 'satuan'));
@@ -237,10 +245,11 @@ class ProductController extends Controller
      */
     public function generateSku(Request $request)
     {
+        $colSku = 'sku';
         do {
             // Generate 12 digit numerik: 4 digit random prefix + 8 digit timestamp
             $sku = str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT) . substr(time(), -8);
-        } while (Product::withTrashed()->where('sku', $sku)->exists());
+        } while (Product::withTrashed()->where($colSku, $sku)->exists());
 
         return response()->json(['sku' => $sku]);
     }

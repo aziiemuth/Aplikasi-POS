@@ -215,6 +215,7 @@ function setMode(mode) {
     });
     event.currentTarget.className = event.currentTarget.className
         .replace('bg-slate-50 text-slate-600 border-slate-200 hover:border-blue-300', 'bg-blue-600 text-white border-blue-600 shadow-sm');
+}
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {

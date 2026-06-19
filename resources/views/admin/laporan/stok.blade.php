@@ -190,6 +190,7 @@ function setMode(mode) {
         btn.className = btn.className.replace('bg-emerald-600 text-white border-emerald-600 shadow-sm', 'bg-slate-50 text-slate-600 border-slate-200 hover:border-emerald-300');
     });
     event.currentTarget.className = event.currentTarget.className.replace('bg-slate-50 text-slate-600 border-slate-200 hover:border-emerald-300', 'bg-emerald-600 text-white border-emerald-600 shadow-sm');
+}
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
