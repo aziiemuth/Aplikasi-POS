@@ -28,23 +28,23 @@ class DashboardController extends Controller
             'produk_stok_tipis'    => Product::active()->lowStock()->count(),
 
             // Hari ini
-            'transaksi_hari_ini'   => Order::lunas()->whereDate('created_at', $today)->count(),
-            'omzet_hari_ini'       => Order::lunas()->whereDate('created_at', $today)->sum('total_pembayaran'),
+            'transaksi_hari_ini'   => Order::lunas()->onDate($today)->count(),
+            'omzet_hari_ini'       => Order::lunas()->onDate($today)->sum('total_pembayaran'),
 
             // Bulan ini
-            'transaksi_bulan_ini'  => Order::lunas()->where('created_at', '>=', $thisMonth)->count(),
-            'omzet_bulan_ini'      => Order::lunas()->where('created_at', '>=', $thisMonth)->sum('total_pembayaran'),
+            'transaksi_bulan_ini'  => Order::lunas()->sinceDate($thisMonth)->count(),
+            'omzet_bulan_ini'      => Order::lunas()->sinceDate($thisMonth)->sum('total_pembayaran'),
         ];
 
         // Laba kotor hari ini
         $stats['laba_hari_ini'] = OrderItem::whereHas('order', fn($q) =>
-            $q->lunas()->whereDate('created_at', $today)
-        )->get()->sum('laba_item');
+            $q->lunas()->onDate($today)
+        )->get()->sum(fn($item) => $item->laba_item);
 
         // Laba kotor bulan ini
         $stats['laba_bulan_ini'] = OrderItem::whereHas('order', fn($q) =>
-            $q->lunas()->where('created_at', '>=', $thisMonth)
-        )->get()->sum('laba_item');
+            $q->lunas()->sinceDate($thisMonth)
+        )->get()->sum(fn($item) => $item->laba_item);
 
         // ── Grafik tren 7 hari terakhir ─────────────────────────
         $trendData = [];
@@ -52,23 +52,23 @@ class DashboardController extends Controller
             $day = now()->subDays($i)->toDateString();
             $trendData[] = [
                 'label'     => Carbon::parse($day)->locale('id')->isoFormat('ddd D/M'),
-                'omzet'     => (float) Order::lunas()->whereDate('created_at', $day)->sum('total_pembayaran'),
-                'transaksi' => Order::lunas()->whereDate('created_at', $day)->count(),
+                'omzet'     => (float) Order::lunas()->onDate($day)->sum('total_pembayaran'),
+                'transaksi' => Order::lunas()->onDate($day)->count(),
             ];
         }
 
         // ── 5 Produk Terlaris bulan ini ─────────────────────────
         $produkTerlaris = OrderItem::selectRaw('nama_produk_snapshot, SUM(jumlah) as total_terjual, SUM(total_harga_item) as total_omzet')
-            ->whereHas('order', fn($q) => $q->lunas()->where('created_at', '>=', $thisMonth))
+            ->whereHas('order', fn($q) => $q->lunas()->sinceDate($thisMonth))
             ->groupBy('nama_produk_snapshot')
-            ->orderByDesc('total_terjual')
+            ->orderByRaw('total_terjual DESC')
             ->limit(5)
             ->get();
 
         // ── 5 Stok Kritis ───────────────────────────────────────
         $stokKritis = Product::active()->lowStock()
             ->with('category')
-            ->orderBy('stok_saat_ini')
+            ->orderByStock()
             ->limit(5)
             ->get();
 

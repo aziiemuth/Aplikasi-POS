@@ -39,7 +39,7 @@ class CacheService
         return Cache::remember(
             self::KEY_CATEGORIES,
             self::CACHE_CATEGORIES,
-            fn () => \App\Models\Category::active()->orderBy('nama_kategori')->get()
+            fn () => \App\Models\Category::active()->orderByName()->get()
         );
     }
 
@@ -67,9 +67,9 @@ class CacheService
                 $key,
                 self::CACHE_PRODUCTS,
                 fn () => \App\Models\Product::active()
-                    ->where('category_id', $categoryId)
+                    ->ofCategory($categoryId)
                     ->with('category')
-                    ->orderBy('nama_produk')
+                    ->orderByName()
                     ->get()
             );
         }
@@ -79,7 +79,7 @@ class CacheService
             self::CACHE_PRODUCTS,
             fn () => \App\Models\Product::active()
                 ->with('category')
-                ->orderBy('nama_produk')
+                ->orderByName()
                 ->get()
         );
     }

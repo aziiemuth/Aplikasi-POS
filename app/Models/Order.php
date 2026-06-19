@@ -96,6 +96,39 @@ class Order extends Model
     }
 
     /**
+     * Scope: order pada tanggal tertentu.
+     */
+    public function scopeOnDate($query, $date)
+    {
+        return $query->whereDate('created_at', $date);
+    }
+
+    /**
+     * Scope: order sejak tanggal tertentu.
+     */
+    public function scopeSinceDate($query, $date)
+    {
+        return $query->where('created_at', '>=', $date);
+    }
+
+    /**
+     * Scope: order terakhir dengan prefix nomor order tertentu.
+     */
+    public function scopeLatestByNumber($query, $prefix)
+    {
+        return $query->where('nomor_order', 'like', $prefix . '%')
+                     ->orderByDesc('id');
+    }
+
+    /**
+     * Scope: filter order milik user/kasir tertentu.
+     */
+    public function scopeForUser($query, $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
+
+    /**
      * Accessor: total laba kotor dari seluruh item.
      * Laba = (harga_jual_snapshot - diskon_item - hpp_snapshot) * jumlah
      * Dikurangi diskon_global
@@ -115,9 +148,7 @@ class Order extends Model
     public static function generateNomorOrder(): string
     {
         $prefix = 'INV-' . date('Ymd') . '-';
-        $lastOrder = self::where('nomor_order', 'LIKE', $prefix . '%')
-                         ->orderByDesc('id')
-                         ->first();
+        $lastOrder = Order::latestByNumber($prefix)->first();
 
         $lastNumber = $lastOrder ? (int) substr($lastOrder->nomor_order, -4) : 0;
 

@@ -28,7 +28,7 @@
         {{-- Notifikasi Stok Tipis (Admin Only) --}}
         @if(auth()->user()?->isAdmin())
             @php
-                $lowStockCount = \App\Models\Product::where('is_active', true)->whereColumn('stok_saat_ini', '<=', 'stok_minimum')->count();
+                $lowStockCount = \App\Models\Product::active()->lowStock()->count();
             @endphp
             @if($lowStockCount > 0)
             <a href="{{ route('admin.products.index', ['stok' => 'tipis']) }}" 

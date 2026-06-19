@@ -87,7 +87,7 @@ class PosCheckout extends Component
         $query = Product::active();
 
         if ($this->categoryId) {
-            $query->where('category_id', $this->categoryId);
+            $query->ofCategory($this->categoryId);
         }
 
         if ($this->search) {
@@ -97,7 +97,7 @@ class PosCheckout extends Component
             });
         }
 
-        return $query->orderBy('nama_produk')->get();
+        return $query->orderByName()->get();
     }
 
     #[Computed]
@@ -109,7 +109,7 @@ class PosCheckout extends Component
     #[Computed]
     public function carts()
     {
-        return Cart::where('user_id', auth()->id())->with('product')->get();
+        return Cart::forUser(auth()->id())->with('product')->get();
     }
 
     // ==========================================
@@ -136,7 +136,7 @@ class PosCheckout extends Component
             return;
         }
 
-        $cart = Cart::where('user_id', auth()->id())->where('product_id', $productId)->first();
+        $cart = Cart::forUser(auth()->id())->forProduct($productId)->first();
 
         if ($cart) {
             if ($cart->jumlah + 1 > $product->stok_saat_ini) {
@@ -215,7 +215,7 @@ class PosCheckout extends Component
 
     public function clearCart()
     {
-        Cart::where('user_id', auth()->id())->delete();
+        Cart::forUser(auth()->id())->delete();
         ActivityLog::log('Kosongkan Keranjang', "Kasir mengosongkan seluruh keranjang belanja.");
         unset($this->carts);
     }
@@ -270,7 +270,7 @@ class PosCheckout extends Component
                 }
 
                 // Kosongkan keranjang kasir
-                Cart::where('user_id', auth()->id())->delete();
+                Cart::forUser(auth()->id())->delete();
             });
 
             ActivityLog::log('Tahan Transaksi', "Kasir menahan transaksi (Open Bill) untuk customer: " . ($this->namaCustomer ?: 'Umum'));
@@ -291,8 +291,8 @@ class PosCheckout extends Component
      */
     public function loadOpenBills()
     {
-        $this->openBills = Order::where('user_id', auth()->id())
-            ->where('status', 'open_bill')
+        $this->openBills = Order::forUser(auth()->id())
+            ->openBill()
             ->with('items')
             ->latest()
             ->limit(10)
@@ -309,7 +309,7 @@ class PosCheckout extends Component
         if (!$order || $order->user_id !== auth()->id() || $order->status !== 'open_bill') return;
 
         // Gabungkan dengan keranjang yang ada (atau timpa)
-        Cart::where('user_id', auth()->id())->delete();
+        Cart::forUser(auth()->id())->delete();
 
         foreach ($order->items as $item) {
             if ($item->product) {
@@ -463,7 +463,7 @@ class PosCheckout extends Component
 
     public function handleBarcodeScan($sku)
     {
-        $product = Product::active()->where('sku', $sku)->first();
+        $product = Product::active()->ofSku($sku)->first();
 
         if ($product) {
             $this->addToCart($product->id);

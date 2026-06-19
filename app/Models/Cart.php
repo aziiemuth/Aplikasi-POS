@@ -39,4 +39,20 @@ class Cart extends Model
     {
         return ($this->product->harga_jual - $this->diskon_item) * $this->jumlah;
     }
+
+    /**
+     * Scope: filter keranjang milik user tertentu.
+     */
+    public function scopeForUser($query, $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
+
+    /**
+     * Scope: filter keranjang untuk produk tertentu.
+     */
+    public function scopeForProduct($query, $productId)
+    {
+        return $query->where('product_id', $productId);
+    }
 }

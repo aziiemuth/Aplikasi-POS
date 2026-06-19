@@ -36,4 +36,12 @@ class Category extends Model
     {
         return $query->where('is_active', true);
     }
+
+    /**
+     * Scope: urutkan berdasarkan nama kategori.
+     */
+    public function scopeOrderByName($query)
+    {
+        return $query->orderBy('nama_kategori');
+    }
 }

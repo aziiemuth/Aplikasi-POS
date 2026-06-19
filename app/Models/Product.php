@@ -100,6 +100,38 @@ class Product extends Model
     }
 
     /**
+     * Scope: urutkan berdasarkan nama produk.
+     */
+    public function scopeOrderByName($query)
+    {
+        return $query->orderBy('nama_produk');
+    }
+
+    /**
+     * Scope: filter berdasarkan kategori.
+     */
+    public function scopeOfCategory($query, $categoryId)
+    {
+        return $query->where('category_id', $categoryId);
+    }
+
+    /**
+     * Scope: urutkan berdasarkan stok saat ini (terkecil dahulu).
+     */
+    public function scopeOrderByStock($query)
+    {
+        return $query->orderBy('stok_saat_ini');
+    }
+
+    /**
+     * Scope: filter berdasarkan SKU.
+     */
+    public function scopeOfSku($query, $sku)
+    {
+        return $query->where('sku', $sku);
+    }
+
+    /**
      * Accessor: apakah stok tersedia untuk dijual.
      */
     public function getIsAvailableAttribute(): bool

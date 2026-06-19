@@ -48,7 +48,7 @@ class StockService
         return DB::transaction(function () use ($product, $jumlah, $hargaBeli, $user, $supplier, $keterangan) {
 
             // Re-fetch product with lock to prevent race conditions (Concurrency fix)
-            $lockedProduct = Product::where('id', $product->id)->lockForUpdate()->first();
+            $lockedProduct = Product::lockForUpdate()->findOrFail($product->id);
             $stokSebelum = $lockedProduct->stok_saat_ini;
             $stokSesudah = $stokSebelum + $jumlah;
 
@@ -134,7 +134,7 @@ class StockService
         return DB::transaction(function () use ($product, $jumlah, $user, $keterangan) {
 
             // Re-fetch product with lock
-            $lockedProduct = Product::where('id', $product->id)->lockForUpdate()->first();
+            $lockedProduct = Product::lockForUpdate()->findOrFail($product->id);
 
             // === Fase 3.3: LARANGAN STOK MINUS ===
             if ($lockedProduct->stok_saat_ini < $jumlah) {
@@ -200,7 +200,7 @@ class StockService
         return DB::transaction(function () use ($product, $jumlah, $orderId, $userId) {
 
             // Re-fetch product with row-level locking (Penting untuk concurency kasir)
-            $lockedProduct = Product::where('id', $product->id)->lockForUpdate()->first();
+            $lockedProduct = Product::lockForUpdate()->findOrFail($product->id);
 
             if ($lockedProduct->stok_saat_ini < $jumlah) {
                 throw new \Exception("Stok {$lockedProduct->nama_produk} tidak mencukupi untuk transaksi!");
