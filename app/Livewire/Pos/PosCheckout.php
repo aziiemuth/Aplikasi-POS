@@ -54,14 +54,14 @@ class PosCheckout extends Component
     public $showReceiptModal = false;
     public $receiptOrderId = null;
 
-    // Dengarkan event StockUpdated dari Reverb
-    public function getListeners()
-    {
-        return [
-            "echo:pos,StockUpdated" => 'refreshProducts',
-            "echo:pos,CatalogUpdated" => 'refreshCatalog',
-        ];
-    }
+    // Dengarkan event StockUpdated dari Reverb (Dinonaktifkan untuk Share Hosting)
+    // public function getListeners()
+    // {
+    //     return [
+    //         "echo:pos,StockUpdated" => 'refreshProducts',
+    //         "echo:pos,CatalogUpdated" => 'refreshCatalog',
+    //     ];
+    // }
 
     public function refreshProducts()
     {

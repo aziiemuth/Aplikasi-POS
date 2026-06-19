@@ -37,14 +37,10 @@ class DashboardController extends Controller
         ];
 
         // Laba kotor hari ini
-        $stats['laba_hari_ini'] = OrderItem::whereHas('order', fn($q) =>
-            $q->lunas()->onDate($today)
-        )->get()->sum(fn($item) => $item->laba_item);
+        $stats['laba_hari_ini'] = Order::lunas()->onDate($today)->get()->sum(fn($order) => $order->laba_kotor);
 
         // Laba kotor bulan ini
-        $stats['laba_bulan_ini'] = OrderItem::whereHas('order', fn($q) =>
-            $q->lunas()->sinceDate($thisMonth)
-        )->get()->sum(fn($item) => $item->laba_item);
+        $stats['laba_bulan_ini'] = Order::lunas()->sinceDate($thisMonth)->get()->sum(fn($order) => $order->laba_kotor);
 
         // ── Grafik tren 7 hari terakhir ─────────────────────────
         $trendData = [];
