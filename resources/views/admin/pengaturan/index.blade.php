@@ -315,6 +315,49 @@
     </div>
 
     {{-- ========================================================
+         SECTION 8.5 — DATA SIMULASI (DUMMY DATA)
+    ======================================================== --}}
+    <div class="bg-white rounded-2xl shadow-sm border border-amber-200 overflow-hidden mb-6">
+        <div class="bg-amber-500 px-4 sm:px-6 py-2.5 sm:py-3 flex items-center gap-3" style="background: linear-gradient(to right, #f59e0b, #d97706)">
+            <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-database text-white text-sm"></i>
+            </div>
+            <div>
+                <h2 class="text-white font-semibold text-sm sm:text-base leading-tight">Data Simulasi (Dummy Data)</h2>
+                <p class="text-amber-100 text-[11px] sm:text-xs">Hasilkan data realistis untuk keperluan testing</p>
+            </div>
+        </div>
+
+        <div class="p-4 sm:p-6">
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+                <div class="flex gap-3">
+                    <i class="fa-solid fa-lightbulb text-amber-600 mt-0.5 shrink-0"></i>
+                    <div class="text-xs text-amber-800 space-y-1">
+                        <p class="font-bold">Apa yang dilakukan fitur ini?</p>
+                        <p>Fitur ini akan secara otomatis membuatkan Kategori, Supplier, 20+ Produk Kelontong realistis (beserta harga & stok), Mutasi Stok awal, dan riwayat Transaksi Penjualan 30 hari terakhir. Sangat berguna untuk melihat laporan dan grafik yang terisi data.</p>
+                        <p class="font-semibold text-amber-700">Catatan: Tindakan ini akan <strong>menambahkan</strong> data baru, tidak menghapus data lama. Sebaiknya kosongkan database di Zona Bahaya terlebih dahulu jika ingin data bersih.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                <div class="text-center sm:text-left">
+                    <p class="text-xs font-bold text-slate-700">Generate Data Toko Kelontong</p>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Berisi produk sembako, minuman, snack, dan simulasi riwayat kasir.</p>
+                </div>
+                <form id="form-seed-dummy" action="{{ route('admin.pengaturan.seed-dummy') }}" method="POST" class="w-full sm:w-auto">
+                    @csrf
+                    <button type="button" onclick="confirmSeedDummy()"
+                        class="w-full sm:w-auto flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs transition-all shadow hover:-translate-y-0.5">
+                        <i class="fa-solid fa-magic-wand-sparkles"></i>
+                        Generate Data Dummy
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- ========================================================
          SECTION 8.3 — REQUEST FEATURE / BANTUAN TEKNIS
     ======================================================== --}}
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -487,6 +530,37 @@ function confirmResetDatabase() {
                     document.getElementById('form-reset-database').submit();
                 }
             });
+        }
+    });
+}
+
+function confirmSeedDummy() {
+    Swal.fire({
+        title: 'Generate Data Dummy?',
+        html: '<div class="text-slate-600 text-sm">Tindakan ini akan <strong>memasukkan puluhan data baru</strong> (Kategori, Supplier, Produk Kelontong, Mutasi Stok, dan Riwayat Penjualan) ke dalam sistem. <br><br>Sangat disarankan untuk dilakukan pada <strong>Database yang kosong</strong>.</div>',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: '<i class="fa-solid fa-magic-wand-sparkles mr-1"></i> Ya, Generate Data',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#f59e0b',
+        cancelButtonColor: '#64748b',
+        width: '440px',
+        customClass: {
+            popup: 'rounded-2xl',
+            confirmButton: 'rounded-xl px-5 py-2 text-sm font-semibold',
+            cancelButton: 'rounded-xl px-5 py-2 text-sm font-semibold'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Memproses Data...',
+                text: 'Sedang men-generate data dummy Toko Kelontong, mohon tunggu sebentar...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            document.getElementById('form-seed-dummy').submit();
         }
     });
 }

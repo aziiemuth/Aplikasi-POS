@@ -114,6 +114,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/pengaturan/import-template', [\App\Http\Controllers\Admin\PengaturanController::class, 'importTemplate'])->name('pengaturan.import.template');
     Route::post('/pengaturan/import-produk', [\App\Http\Controllers\Admin\PengaturanController::class, 'importProduk'])->name('pengaturan.import.produk');
     Route::post('/pengaturan/reset', [\App\Http\Controllers\Admin\PengaturanController::class, 'resetDatabase'])->name('pengaturan.reset');
+    Route::post('/pengaturan/seed-dummy', [\App\Http\Controllers\Admin\PengaturanController::class, 'seedDummyTokoKelontong'])->name('pengaturan.seed-dummy');
 
 });
 

@@ -168,8 +168,6 @@ class PengaturanController extends Controller
         }
 
         try {
-            DB::beginTransaction();
-
             // Disable foreign key checks
             DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
@@ -204,8 +202,6 @@ class PengaturanController extends Controller
             // Enable foreign key checks
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-            DB::commit();
-
             // Bersihkan cache POS & sistem agar perubahan langsung terlihat di kasir
             \App\Services\CacheService::forgetAll();
             \Illuminate\Support\Facades\Cache::flush();
@@ -216,11 +212,33 @@ class PengaturanController extends Controller
             return redirect()->route('admin.pengaturan.index')
                 ->with('success', 'Database berhasil disetel ulang (kecuali data user)!');
         } catch (\Throwable $e) {
-            DB::rollBack();
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
             return redirect()->route('admin.pengaturan.index')
                 ->with('error', 'Reset database gagal: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Generate Dummy Data untuk Toko Kelontong
+     */
+    public function seedDummyTokoKelontong(Request $request)
+    {
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('admin.pengaturan.index')
+                ->with('error', 'Hanya admin yang diperbolehkan untuk generate data dummy.');
+        }
+
+        try {
+            \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'TokoKelontongSeeder']);
+            
+            ActivityLog::log('Generate Data Dummy', 'Admin men-generate data dummy Toko Kelontong.');
+
+            return redirect()->route('admin.pengaturan.index')
+                ->with('success', 'Data dummy Toko Kelontong berhasil di-generate!');
+        } catch (\Throwable $e) {
+            return redirect()->route('admin.pengaturan.index')
+                ->with('error', 'Gagal generate data dummy: ' . $e->getMessage());
         }
     }
 }
