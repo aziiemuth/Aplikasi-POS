@@ -259,6 +259,30 @@ class TokoKelontongSeeder extends Seeder
             }
         }
 
+        // 5b. Buat beberapa Stok Masuk hari ini agar dashboard seimbang
+        $restockProducts = Product::inRandomOrder()->limit(3)->get();
+        foreach($restockProducts as $rp) {
+            $addQty = rand(10, 50);
+            $stokSebelum = $rp->stok_saat_ini;
+            
+            // Update stok produk
+            $rp->update(['stok_saat_ini' => $stokSebelum + $addQty]);
+            
+            // Catat mutasi masuk hari ini
+            StockMutation::create([
+                'product_id' => $rp->id,
+                'user_id' => $user->id, // Admin yang menerima barang
+                'supplier_id' => Supplier::inRandomOrder()->first()->id ?? null,
+                'tipe' => 'masuk',
+                'jumlah' => $addQty,
+                'stok_sebelum' => $stokSebelum,
+                'stok_sesudah' => $stokSebelum + $addQty,
+                'harga_beli' => $rp->modal_hpp,
+                'keterangan' => 'Restock Barang (Simulasi Hari Ini)',
+                'created_at' => Carbon::now()->subHours(rand(1, 8)) // Masuk hari ini
+            ]);
+        }
+
         // 6. Buat beberapa produk menjadi stok tipis (dibawah stok_minimum)
         $lowStockProducts = Product::inRandomOrder()->limit(4)->get();
         foreach($lowStockProducts as $lp) {

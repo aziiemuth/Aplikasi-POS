@@ -22,7 +22,7 @@
 
 
     {{-- Navigation Menu --}}
-    <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-0.5 scrollbar-thin scrollbar-track-slate-800 scrollbar-thumb-slate-600">
+    <nav id="sidebar-scroll" class="flex-1 overflow-y-auto py-4 px-3 space-y-0.5 scrollbar-thin scrollbar-track-slate-800 scrollbar-thumb-slate-600">
 
         {{-- ===== MENU KASIR (Semua role) ===== --}}
         <div class="mb-3 flex flex-col gap-1">
@@ -214,5 +214,21 @@ function confirmLogout() {
         customClass: { popup: 'rounded-2xl', confirmButton: 'rounded-xl', cancelButton: 'rounded-xl' }
     }).then((r) => { if (r.isConfirmed) document.getElementById('logout-form').submit(); });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('sidebar-scroll');
+    if (sidebar) {
+        // Kembalikan posisi scroll terakhir
+        const scrollPos = localStorage.getItem('sidebar_scroll_pos');
+        if (scrollPos) {
+            sidebar.scrollTop = scrollPos;
+        }
+
+        // Simpan posisi scroll setiap kali berubah
+        sidebar.addEventListener('scroll', function() {
+            localStorage.setItem('sidebar_scroll_pos', sidebar.scrollTop);
+        });
+    }
+});
 </script>
 @endpush
